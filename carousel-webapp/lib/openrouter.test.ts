@@ -45,3 +45,34 @@ describe('buildSlotFillPrompt', () => {
     expect(prompt).toContain('80')
   })
 })
+
+import { buildTemplateGenSystemPrompt } from './openrouter'
+
+describe('buildTemplateGenSystemPrompt', () => {
+  it('includes canvas dimensions', () => {
+    const prompt = buildTemplateGenSystemPrompt()
+    expect(prompt).toContain('1080')
+    expect(prompt).toContain('1350')
+  })
+
+  it('includes data-slot annotation rules', () => {
+    const prompt = buildTemplateGenSystemPrompt()
+    expect(prompt).toContain('data-slot')
+  })
+
+  it('includes CSS variable conventions', () => {
+    const prompt = buildTemplateGenSystemPrompt()
+    expect(prompt).toContain('--accent')
+  })
+
+  it('enforces HTML-only output (no markdown fences)', () => {
+    const prompt = buildTemplateGenSystemPrompt()
+    expect(prompt).toContain('HTML only')
+  })
+
+  it('includes a worked example with data-slot attributes', () => {
+    const prompt = buildTemplateGenSystemPrompt()
+    expect(prompt).toContain('WORKED EXAMPLE')
+    expect(prompt).toMatch(/data-slot="s1_headline"/)
+  })
+})

@@ -126,3 +126,148 @@ export async function fillSlots(
   const content = response.choices[0]?.message?.content ?? '{}'
   return JSON.parse(content) as Record<string, string>
 }
+
+// ─── Template Generation (GOOD_MODEL only) ────────────────────────────────────
+
+const TEMPLATE_EXAMPLE = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent: #E05828;
+  --bg: #F0EDE5;
+  --dark: #111110;
+  --sw: 1080px;
+  --sh: 1350px;
+  --scale: 0.5;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { width: var(--sw); height: var(--sh); overflow: hidden; }
+.slide {
+  width: var(--sw);
+  height: var(--sh);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  padding: 72px;
+  transform-origin: top left;
+  transform: scale(var(--scale));
+}
+.headline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 130px;
+  font-weight: 900;
+  line-height: 0.95;
+  color: var(--dark);
+  text-transform: uppercase;
+}
+.body-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 32px;
+  color: var(--dark);
+  margin-top: 40px;
+}
+.brand {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: auto;
+}
+</style>
+</head>
+<body>
+<div class="slide">
+  <h1 class="headline" data-slot="s1_headline" data-slot-size="headline">Most Investors Get This Wrong</h1>
+  <p class="body-text" data-slot="s1_body">And it costs them 30% returns every year.</p>
+  <p class="brand" data-slot="s1_brand">FinanceFirst</p>
+</div>
+</body>
+</html>`
+
+export function buildTemplateGenSystemPrompt(): string {
+  return `You are an expert HTML/CSS designer specialising in social media carousel slides.
+
+## TASK
+Generate a single self-contained HTML template for a carousel slide based on the provided reference images.
+
+## REQUIRED SPECIFICATIONS
+- Canvas: exactly 1080×1350px (set on both body and .slide element)
+- The .slide element must have: width: 1080px; height: 1350px; transform-origin: top left; transform: scale(0.5);
+- Minimum inner padding: 72px on all sides
+- Load fonts from Google Fonts only (no system fonts, no other CDNs)
+- All colours must be CSS custom properties on :root (e.g., --accent, --bg, --dark, --text)
+- All font sizes that should be editable must be CSS custom properties (e.g., --headline-size)
+
+## SLOT ANNOTATION RULES
+Every element whose text content should be user-editable MUST have: data-slot="unique_id"
+Every element whose font size is controlled by a CSS var MUST also have: data-slot-size="slot_name"
+
+Slot ID naming convention:
+- s1_headline — slide 1 main headline
+- s1_body — slide 1 body text
+- s1_brand — slide 1 brand/creator name
+- s1_stat — slide 1 stat or big number
+- s1_caption — slide 1 small caption
+
+## CSS VARIABLE CONVENTIONS
+:root {
+  --accent: #E05828;  /* primary accent colour */
+  --bg: #F0EDE5;      /* slide background colour */
+  --dark: #111110;    /* primary text colour */
+  --sw: 1080px;
+  --sh: 1350px;
+  --scale: 0.5;
+}
+
+## WORKED EXAMPLE (replicate this structure exactly)
+${TEMPLATE_EXAMPLE}
+
+## OUTPUT RULES
+- Output HTML only — no explanation, no markdown fences, no code block wrappers
+- The entire response must be a valid complete HTML document starting with <!DOCTYPE html>
+- Must be self-contained (no external JS; Google Fonts only for external resources)
+- Must include at minimum: s1_headline and s1_body slots with data-slot attributes
+- Match the visual style, layout, colours, and typography of the reference images as closely as possible`
+}
+
+export async function generateTemplate(
+  images: string[],
+  description?: string
+): Promise<string> {
+  const openai = getClient()
+  const response = await openai.chat.completions.create({
+    model: GOOD_MODEL,
+    messages: [
+      {
+        role: 'system',
+        content: buildTemplateGenSystemPrompt(),
+      },
+      {
+        role: 'user',
+        content: [
+          ...images.map(url => ({
+            type: 'image_url' as const,
+            image_url: { url },
+          })),
+          {
+            type: 'text' as const,
+            text: description
+              ? `Generate a carousel template matching this style. Additional notes: ${description}`
+              : 'Generate a carousel template that closely matches the visual style of these reference images.',
+          },
+        ],
+      },
+    ],
+    max_tokens: 8000,
+  })
+
+  const html = response.choices[0].message.content ?? ''
+  // Strip any accidental markdown fences the model may have wrapped the output in
+  return html.replace(/^```html?\n?/i, '').replace(/\n?```$/i, '').trim()
+}
