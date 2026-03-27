@@ -15,6 +15,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import type { SlotDefinition, Template } from '@/types/template'
 import { CANVAS_SIZES } from '@/types/carousel'
 import { updateCarousel } from '@/lib/pocketbase'
+import { BrandPrompt } from '@/components/BrandPrompt'
+import { useBrandProfile } from '@/hooks/useBrandProfile'
 
 // Typed accessor for the window-level capture-resolve bridge used by useExport.
 interface WindowWithCapture extends Window {
@@ -38,6 +40,8 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
     carousel?.slideCount ?? 0,
     carousel?.title ?? ''
   )
+  const { isFilled } = useBrandProfile()
+  const [showBrandPrompt, setShowBrandPrompt] = useState(false)
 
   useEffect(() => {
     getCaptureWindow().__captureResolve = null
@@ -73,11 +77,15 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
     setShowTemplatePicker(false)
   }
 
-  async function handleExport() {
+  async function handleExport(): Promise<void> {
     await exportZip(async (index) => {
       setActiveSlideIndex(index)
       await new Promise(r => setTimeout(r, 400))
     })
+    const dismissed = localStorage.getItem('brand_prompt_dismissed') === 'true'
+    if (!isFilled && !dismissed) {
+      setShowBrandPrompt(true)
+    }
   }
 
   if (isLoading || !carousel) {
@@ -144,6 +152,10 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
           </div>
           <TemplatePicker onSelect={handleSelectTemplate} selectedId={templateId} />
         </div>
+      )}
+
+      {showBrandPrompt && (
+        <BrandPrompt onDismiss={() => setShowBrandPrompt(false)} />
       )}
     </div>
   )
