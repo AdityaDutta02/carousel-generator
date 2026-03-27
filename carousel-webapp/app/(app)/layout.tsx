@@ -13,6 +13,7 @@ function getNavItems(): NavItem[] {
     { href: '/dashboard', label: 'My Carousels' },
     { href: '/generate', label: 'New Carousel' },
     { href: '/templates', label: 'Templates' },
+    { href: '/settings', label: 'Settings' },
   ]
 }
 
