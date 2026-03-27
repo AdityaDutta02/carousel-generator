@@ -1,15 +1,15 @@
 import PocketBase from 'pocketbase'
 import type { Carousel, Slide } from '@/types/carousel'
 
-let pb: PocketBase | null = null
+let _pb: PocketBase | null = null
 
 export function getPocketBase(): PocketBase {
-  if (!pb) {
-    pb = new PocketBase(
+  if (!_pb) {
+    _pb = new PocketBase(
       process.env.NEXT_PUBLIC_POCKETBASE_URL ?? 'http://127.0.0.1:8090'
     )
   }
-  return pb
+  return _pb
 }
 
 export interface UserContext {
@@ -102,3 +102,6 @@ function recordToCarousel(r: Record<string, unknown>): Carousel {
     updated: String(r['updated']),
   }
 }
+
+// Singleton instance — used by client-side code that needs direct PocketBase access
+export const pb = getPocketBase()
