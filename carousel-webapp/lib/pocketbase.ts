@@ -105,3 +105,14 @@ function recordToCarousel(r: Record<string, unknown>): Carousel {
 
 // Singleton instance — used by client-side code that needs direct PocketBase access
 export const pb = getPocketBase()
+
+// ── Template admin operations ───────────────────────────────────────────────
+
+import type { Template } from '@/types/template'
+
+export async function publishTemplate(templateId: string): Promise<Template> {
+  return getPocketBase().collection('templates').update(templateId, {
+    scope: 'system',
+    owner: null,
+  }) as Promise<Template>
+}
