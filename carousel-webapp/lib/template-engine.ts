@@ -13,6 +13,15 @@ export function getSlideSlots(schema: SchemaJson, slideNumber: number): SlotDefi
   return schema.slots.filter(s => s.slide === slideNumber)
 }
 
+function sanitizeCssVar(value: string): string {
+  // Allow hex colors, named colors, rgb/hsl functions — strip control chars and injection vectors
+  return value.replace(/[^a-zA-Z0-9#(),.\s%]/g, '')
+}
+
+function sanitizeFontSize(value: string): string {
+  return /^\d+(\.\d+)?(px|em|rem|vh|vw|%)$/.test(value.trim()) ? value.trim() : '16px'
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, '&amp;')

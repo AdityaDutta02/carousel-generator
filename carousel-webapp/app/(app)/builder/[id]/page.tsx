@@ -78,7 +78,7 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
   }
 
   async function handleExport(): Promise<void> {
-    await exportZip(async (index) => {
+    await exportZip(previewRef, async (index) => {
       setActiveSlideIndex(index)
       await new Promise(r => setTimeout(r, 400))
     })

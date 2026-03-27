@@ -1,7 +1,8 @@
 'use client'
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import JSZip from 'jszip'
 import type { SlidePreviewHandle } from '@/components/editor/SlidePreview'
+import type React from 'react'
 
 export function buildZipFilename(title: string): string {
   if (!title.trim()) return 'carousel.zip'
@@ -17,18 +18,12 @@ export function buildZipFilename(title: string): string {
 export function useExport(slideCount: number, title: string) {
   const [isExporting, setIsExporting] = useState(false)
   const [progress, setProgress] = useState(0)
-  const previewRefs = useRef<Map<number, SlidePreviewHandle>>(new Map())
-
-  function registerSlideRef(index: number, handle: SlidePreviewHandle | null): void {
-    if (handle) {
-      previewRefs.current.set(index, handle)
-    } else {
-      previewRefs.current.delete(index)
-    }
-  }
 
   const exportZip = useCallback(
-    async (onSwitchSlide: (index: number) => Promise<void>): Promise<void> => {
+    async (
+      previewRef: React.RefObject<SlidePreviewHandle | null>,
+      onSwitchSlide: (index: number) => Promise<void>
+    ): Promise<void> => {
       setIsExporting(true)
       setProgress(0)
       const zip = new JSZip()
@@ -38,17 +33,15 @@ export function useExport(slideCount: number, title: string) {
         await new Promise(r => setTimeout(r, 300))
 
         const dataUrl = await new Promise<string | null>(resolve => {
-          const handle = previewRefs.current.get(0)
+          const handle = previewRef.current
           if (!handle) { resolve(null); return }
 
           const timeout = setTimeout(() => resolve(null), 5000)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const origHandler = (window as any).__captureResolve
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ;(window as any).__captureResolve = (url: string | null) => {
             clearTimeout(timeout)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ;(window as any).__captureResolve = origHandler
+            ;(window as any).__captureResolve = null
             resolve(url)
           }
           handle.capture()
@@ -76,5 +69,5 @@ export function useExport(slideCount: number, title: string) {
     [slideCount, title]
   )
 
-  return { isExporting, progress, exportZip, registerSlideRef }
+  return { isExporting, progress, exportZip }
 }

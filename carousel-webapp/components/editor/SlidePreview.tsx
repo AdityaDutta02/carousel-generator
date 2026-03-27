@@ -62,7 +62,7 @@ export const SlidePreview = forwardRef<SlidePreviewHandle, SlidePreviewProps>(
           ref={iframeRef}
           title="slide-preview"
           srcDoc={srcdoc}
-          sandbox="allow-scripts allow-same-origin"
+          sandbox="allow-scripts"
           className="absolute top-0 left-0 border-0"
           style={{
             width: canvasWidth,
