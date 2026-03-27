@@ -15,7 +15,6 @@ describe('Carousel types', () => {
   })
 
   it('CarouselStatus is a union', () => {
-    const s: CarouselStatus = 'draft'
-    expectTypeOf(s).toEqualTypeOf<'draft' | 'exported'>()
+    expectTypeOf<CarouselStatus>().toEqualTypeOf<'draft' | 'exported'>()
   })
 })

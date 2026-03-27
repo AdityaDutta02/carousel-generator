@@ -18,7 +18,7 @@ export interface AuthUser {
 type PbClient = ReturnType<typeof getPocketBase>
 
 function getAuthUser(pb: PbClient): AuthUser | null {
-  return pb.authStore.isValid ? (pb.authStore.model as AuthUser) : null
+  return pb.authStore.isValid ? (pb.authStore.model as unknown as AuthUser) : null
 }
 
 async function runWithLoading(
