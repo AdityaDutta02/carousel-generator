@@ -1,17 +1,33 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { streamCopyGeneration } from '@/lib/openrouter'
+import { verifyToken } from '@/lib/pocketbase'
 import type { UserContext } from '@/lib/pocketbase'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest): Promise<Response> {
-  const body = (await req.json()) as {
-    messages: Array<{ role: 'user' | 'assistant'; content: string }>
-    userContext: UserContext | null
+  const authHeader = req.headers.get('authorization') ?? ''
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
+  const user = token ? await verifyToken(token) : null
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const stream = await streamCopyGeneration(body.messages, body.userContext)
+  const userContext: UserContext = {
+    brand: (user['brand_name'] as string) ?? '',
+    handle: (user['handle'] as string) ?? '',
+    audience: (user['target_audience'] as string) ?? '',
+    tone: (user['tone'] as string) ?? 'professional',
+    platform: (user['platform_preference'] as string) ?? 'linkedin',
+    ctaDefault: 'Follow for more',
+  }
+
+  const body = (await req.json()) as {
+    messages: Array<{ role: 'user' | 'assistant'; content: string }>
+  }
+
+  const stream = await streamCopyGeneration(body.messages, userContext)
 
   return new Response(stream.pipeThrough(new TextEncoderStream()), {
     headers: {

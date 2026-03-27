@@ -110,9 +110,57 @@ export const pb = getPocketBase()
 
 import type { Template } from '@/types/template'
 
+/**
+ * Convenience wrapper: creates a carousel from a Template, auto-populating
+ * canvas dimensions, slide count, and default slides from the template.
+ */
+export async function createCarouselFromTemplate(
+  template: Template,
+  title = 'Untitled Carousel'
+): Promise<Carousel> {
+  const client = getPocketBase()
+  const userId = client.authStore.model?.id as string | undefined
+  if (!userId) throw new Error('Not authenticated')
+
+  const slideCount = template.slideCountDefault ?? 5
+  const slides: Slide[] = Array.from({ length: slideCount }, (_, i) => ({
+    index: i,
+    slots: {},
+  }))
+
+  return createCarousel({
+    owner: userId,
+    title,
+    templateId: template.id,
+    platform: 'linkedin',
+    canvasWidth: template.canvasWidth,
+    canvasHeight: template.canvasHeight,
+    slideCount,
+    slides,
+    status: 'draft',
+  })
+}
+
 export async function publishTemplate(templateId: string): Promise<Template> {
   return getPocketBase().collection('templates').update(templateId, {
     scope: 'system',
     owner: null,
   }) as Promise<Template>
+}
+
+/**
+ * Verifies a PocketBase auth token server-side.
+ * Returns the user record if valid, null otherwise.
+ * Used in API route handlers (server-side only).
+ */
+export async function verifyToken(token: string): Promise<Record<string, unknown> | null> {
+  try {
+    const pb = getPocketBase()
+    // Use PocketBase's built-in auth refresh to validate the token
+    pb.authStore.save(token, null)
+    const authData = await pb.collection('users').authRefresh()
+    return authData.record as Record<string, unknown>
+  } catch {
+    return null
+  }
 }

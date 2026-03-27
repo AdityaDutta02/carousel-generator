@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateTemplate } from '@/lib/openrouter'
+import { verifyToken } from '@/lib/pocketbase'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  const authHeader = req.headers.get('authorization') ?? ''
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
+  const user = token ? await verifyToken(token) : null
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const body = (await req.json()) as { images?: unknown; description?: unknown }
 
   if (!Array.isArray(body.images) || body.images.length === 0) {

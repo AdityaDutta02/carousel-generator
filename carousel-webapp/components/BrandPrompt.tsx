@@ -21,14 +21,21 @@ export function BrandPrompt({ onDismiss }: BrandPromptProps): React.JSX.Element 
     profile.platformPreference
   )
 
+  const [error, setError] = useState<string | null>(null)
+
   const handleDontAskAgain = (): void => {
     localStorage.setItem('brand_prompt_dismissed', 'true')
     onDismiss?.()
   }
 
   const handleSave = async (): Promise<void> => {
-    await save({ brandName, displayName, handle, tone, targetAudience, platformPreference })
-    onDismiss?.()
+    setError(null)
+    try {
+      await save({ brandName, displayName, handle, tone, targetAudience, platformPreference })
+      onDismiss?.()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save. Please try again.')
+    }
   }
 
   return (
@@ -122,6 +129,9 @@ export function BrandPrompt({ onDismiss }: BrandPromptProps): React.JSX.Element 
           </div>
         </div>
 
+        {error && (
+          <p className="px-6 pb-2 text-red-400 text-sm" data-testid="brand-prompt-error">{error}</p>
+        )}
         <div className="px-6 pb-6 flex items-center justify-between">
           <div className="flex gap-2">
             <Button

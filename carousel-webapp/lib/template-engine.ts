@@ -60,11 +60,12 @@ export function injectSlotValues(
         `$1${escapeHtml(value)}$2`
       )
     } else if (slot.type === 'css_var' && slot.variable) {
-      cssVarOverrides.push(`  ${slot.variable}: ${value};`)
+      cssVarOverrides.push(`  ${slot.variable}: ${sanitizeCssVar(value)};`)
     } else if (slot.type === 'font_size') {
+      const safeSize = sanitizeFontSize(value)
       result = result.replace(
         new RegExp(`(<[^>]+data-slot-size="${slot.id}"[^>]*style=")([^"]*)(")`,'g'),
-        `$1$2 font-size: ${value}px;$3`
+        `$1$2 font-size: ${safeSize};$3`
       )
     }
   }
