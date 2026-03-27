@@ -6,11 +6,15 @@ vi.mock('@/lib/openrouter', () => ({
   generateTemplate: vi.fn().mockResolvedValue('<html><body><div class="slide">mock</div></body></html>'),
 }))
 
+vi.mock('@/lib/pocketbase', () => ({
+  verifyToken: vi.fn().mockResolvedValue({ id: 'user-1' }),
+}))
+
 function makeRequest(body: unknown) {
   return new NextRequest('http://localhost/api/ai/generate-template', {
     method: 'POST',
     body: JSON.stringify(body),
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer test-token' },
   })
 }
 
