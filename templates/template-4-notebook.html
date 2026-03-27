@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE 4 — NOTEBOOK / HANDWRITTEN  ·  8-slide carousel
+  Palette: yellow-green bg · cream paper · near-black text · blue date ink
+  Fonts:   Caveat (handwritten) · Special Elite (typewriter) · Barlow Condensed · DM Sans · Lora
+
+  All 8 slides use the same paper-on-background structure (back layers + clip + dot-grid front paper).
+  Only the paper interior content changes.
+
+  HOW TO EDIT:
+  1. Change design tokens in :root for whole-carousel retheme.
+  2. Search <!-- EDIT --> — every content placeholder is marked.
+  3. Each slide header comment lists exactly what to change.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template 4 — Notebook · 8 Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@900&family=Caveat:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Lora:ital@1&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+
+/* ── DESIGN TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg:          #C4EA58;   /* EDIT: yellow-green slide background */
+  --paper:       #FAFAF8;   /* EDIT: front paper color */
+  --paper-back:  #F0EDE5;   /* EDIT: back paper layers */
+  --highlight:   #C4EA58;   /* EDIT: <mark> highlighter color */
+  --text:        #111110;
+  --blue:        #1A3FBE;   /* EDIT: handwritten date/note color */
+  --clip:        #888880;   /* EDIT: paperclip metal color */
+  --accent:      #E05828;   /* EDIT: orange for numbers/accents */
+
+  /* EDIT: font sizes */
+  --sz-brand:   44px;   /* Caveat handwritten brand */
+  --sz-title:   86px;   /* Special Elite typewriter title */
+  --sz-close:  118px;   /* Barlow Condensed closing line */
+  --sz-body:    38px;   /* DM Sans body text */
+  --sz-date:    44px;   /* Caveat date/subtext */
+  --sz-stat:   200px;   /* Caveat big handwritten number */
+  --sz-quote:   52px;   /* Lora italic quote */
+  --sz-list:    36px;   /* list item text */
+  --sz-check:   36px;   /* checklist item text */
+}
+
+/* ── RESET ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── SHELL ──────────────────────────────────────────────────────── */
+body {
+  background: #161616;
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 48px 24px; gap: 28px;
+  font-family: 'DM Sans', sans-serif;
+}
+.page-label {
+  color: rgba(255,255,255,0.28);
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+}
+
+/* ── VIEWER ─────────────────────────────────────────────────────── */
+.viewer {
+  position: relative;
+  width: 540px; height: 675px;
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 48px 96px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.06);
+  cursor: default;
+}
+
+/* ── SLIDE ──────────────────────────────────────────────────────── */
+.slide {
+  position: absolute; inset: 0;
+  width: 1080px; height: 1350px;
+  transform: scale(0.5); transform-origin: top left;
+  background: var(--bg); overflow: hidden;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* ── BACK PAPER LAYERS (shared across all slides) ───────────────── */
+.paper-back-2 {
+  position: absolute; left: 80px; top: 200px;
+  width: 920px; height: 1000px;
+  background: var(--paper-back); border-radius: 24px;
+  transform: rotate(3.5deg);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+.paper-back-1 {
+  position: absolute; left: 80px; top: 200px;
+  width: 920px; height: 1000px;
+  background: var(--paper-back); border-radius: 24px;
+  transform: rotate(-2deg);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+/* ── FRONT PAPER WITH DOT GRID ──────────────────────────────────── */
+.paper-top {
+  position: absolute; left: 80px; top: 200px;
+  width: 920px; height: 1000px;
+  background-color: var(--paper);
+  background-image: radial-gradient(circle, rgba(17,17,16,0.2) 1.5px, transparent 1.5px);
+  background-size: 40px 40px;
+  border-radius: 24px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+  padding: 80px 80px 72px;
+  display: flex; flex-direction: column;
+}
+
+/* ── PAPERCLIP ──────────────────────────────────────────────────── */
+.clip {
+  position: absolute; top: -52px; left: 50%;
+  transform: translateX(-50%);
+  width: 56px; height: 120px;
+}
+.clip::before, .clip::after {
+  content: '';
+  position: absolute; left: 50%;
+  transform: translateX(-50%);
+  border-radius: 100px;
+  border: 5px solid var(--clip);
+  background: transparent;
+}
+.clip::before { width: 56px; height: 120px; top: 0; }
+.clip::after  { width: 36px; height: 84px; top: 20px; background: var(--paper); border-color: var(--clip); }
+
+/* ── PAPER INNER (content area) ─────────────────────────────────── */
+.paper-inner {
+  display: flex; flex-direction: column;
+  height: 100%; justify-content: space-between;
+  padding-top: 16px;
+  color: var(--text);
+}
+
+/* ── BG BRAND LABEL (on green background, below paper) ──────────── */
+.bg-brand {
+  position: absolute; bottom: 72px; left: 80px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 28px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(17,17,16,0.45);
+}
+
+/* ── PAPER TYPOGRAPHY ───────────────────────────────────────────── */
+
+/* Caveat handwritten brand */
+.brand-hand {
+  font-family: 'Caveat', cursive; font-size: var(--sz-brand);
+  font-weight: 700; letter-spacing: 0.02em;
+}
+
+/* Special Elite typewriter title */
+.title-stamp {
+  font-family: 'Special Elite', cursive;
+  font-size: var(--sz-title); line-height: 1.18; letter-spacing: 0.01em;
+}
+/* Highlighter effect — wrap text in <mark> */
+.title-stamp mark {
+  background: var(--highlight); color: var(--text);
+  padding: 0 6px; border-radius: 4px;
+  box-decoration-break: clone; -webkit-box-decoration-break: clone;
+}
+
+/* Caveat date / subtext */
+.date-hand {
+  font-family: 'Caveat', cursive; font-size: var(--sz-date);
+  font-weight: 400; letter-spacing: 0.02em; color: var(--blue);
+}
+
+/* Barlow Condensed closing line */
+.close-line {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-close); font-weight: 900;
+  line-height: 0.88; text-transform: uppercase;
+  letter-spacing: -0.015em;
+}
+
+/* DM Sans body text on paper */
+.paper-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--sz-body); font-weight: 300; line-height: 1.58;
+}
+.paper-body strong { font-weight: 600; }
+
+/* Section eyebrow on paper */
+.paper-eyebrow {
+  font-family: 'Special Elite', cursive;
+  font-size: 32px; line-height: 1.2;
+  color: rgba(17,17,16,0.45);
+  letter-spacing: 0.02em;
+}
+
+/* Big handwritten stat number */
+.big-hand {
+  font-family: 'Caveat', cursive;
+  font-size: var(--sz-stat); font-weight: 700;
+  line-height: 0.88; letter-spacing: -0.02em; color: var(--accent);
+}
+
+/* Lora italic quote on paper */
+.paper-quote {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: var(--sz-quote); line-height: 1.38;
+}
+
+/* Numbered list on paper */
+.paper-list { display: flex; flex-direction: column; gap: 24px; }
+.paper-list-item {
+  display: flex; align-items: flex-start; gap: 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--sz-list); font-weight: 300; line-height: 1.5;
+}
+.paper-list-num {
+  font-family: 'Special Elite', cursive;
+  font-size: 32px; color: var(--accent);
+  flex-shrink: 0; width: 56px; padding-top: 2px;
+}
+
+/* Checklist on paper */
+.checklist { display: flex; flex-direction: column; gap: 24px; }
+.check-item {
+  display: flex; align-items: flex-start; gap: 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: var(--sz-check); font-weight: 300; line-height: 1.5;
+}
+.check-mark {
+  font-family: 'Special Elite', cursive;
+  font-size: 32px; color: var(--accent);
+  flex-shrink: 0; width: 48px; padding-top: 2px;
+}
+
+/* ── CONTROLS ───────────────────────────────────────────────────── */
+.controls { display: flex; align-items: center; gap: 20px; }
+.nav-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s, border-color 0.18s, transform 0.12s;
+}
+.nav-btn:hover  { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.35); }
+.nav-btn:active { transform: scale(0.93); }
+.nav-btn svg { width: 17px; height: 17px; }
+.dots { display: flex; gap: 7px; }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.28); border: none; cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.dot.active { background: var(--accent); transform: scale(1.4); }
+.counter {
+  color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 500;
+  min-width: 44px; text-align: center; letter-spacing: 0.05em;
+}
+
+</style>
+</head>
+<body>
+
+<p class="page-label">Template 4 — Notebook / Handwritten &nbsp;·&nbsp; 8 Slides</p>
+
+<div class="viewer" id="viewer">
+
+  <!-- ══ SLIDE 1 · COVER ══════════════════════════════════════════
+       EDIT: brand-hand, title-stamp (wrap key phrase in <mark>),
+             date-hand, close-line, bg-brand                        -->
+  <div class="slide active" id="s1">
+    <div class="paper-back-2"></div>
+    <div class="paper-back-1"></div>
+    <div class="paper-top">
+      <div class="clip"></div>
+      <div class="paper-inner">
+
+        <!-- EDIT: handwritten brand / author at top -->
+        <span class="brand-hand">[brand name]</span>
+
+        <!-- EDIT: main title. Wrap one phrase in <mark> for the highlighter effect. -->
+        <p class="title-stamp">
+          [Your main title<br>goes here with<br><mark>[highlighted phrase]</mark>.]
+        </p>
+
+        <!-- EDIT: handwritten subtext or date -->
+        <span class="date-hand">[date or subtext]</span>
+
+        <!-- EDIT: bold closing line at bottom of paper — short, punchy -->
+        <p class="close-line">[Let's go.]</p>
+
+      </div>
+    </div>
+    <!-- EDIT: brand label on green background, bottom-left -->
+    <span class="bg-brand">[BRAND]</span>
+  </div>
+
+
+  <!-- ══ SLIDE 2 · POINT 1 ════════════════════════════════════════
+       EDIT: brand-hand, paper-eyebrow, title-stamp, paper-body,
+             date-hand (or delete if not needed)                    -->
+  <div class="slide" id="s2">
+    <div class="paper-back-2"></div>
+    <div class="paper-back-1"></div>
+    <div class="paper-top">
+      <div class="clip"></div>
+      <div class="paper-inner">
+
+        <span class="brand-hand">[brand name]</span>
+
+        <!-- EDIT: section label — typewriter style -->
+        <span class="paper-eyebrow">[Section 1 — e.g. "The Problem"]</span>
+
+        <!-- EDIT: section title, with optional <mark> -->
+        <p class="title-stamp">
+          [Point one title<br>goes right here.]
+        </p>
+
+        <!-- EDIT: 3–4 sentence body paragraph -->
+        <p class="paper-body">
+          [First sentence sets up the point. Second adds the evidence or context. Third lands the implication for the reader.]
+        </p>
+
+        <!-- EDIT: handwritten note, date, or delete this element -->
+        <span class="date-hand">[note or date]</span>
+
+      </div>
+    </div>
+    <span class="bg-brand">[BRAND]</span>
+  </div>
+
+
+  <!-- ══ SLIDE 3 · POINT 2 (LIST) ═════════════════════════════════
+       EDIT: brand-hand, eyebrow, title-stamp, 3 list items         -->
+  <div class="slide" id="s3">
+    <div class="paper-back-2"></div>
+    <div class="paper-back-1"></div>
+    <div class="paper-top">
+      <div class="clip"></div>
+      <div class="paper-inner">
+
+        <span class="brand-hand">[brand name]</span>
+
+        <span class="paper-eyebrow">[Section 2 — e.g. "The Steps"]</span>
+
+        <!-- EDIT: list section title -->
+        <p class="title-stamp">[3 things<br>that matter.]</p>
+
+        <!-- EDIT: 3 numbered list items -->
+        <div class="paper-list">
+          <div class="paper-list-item">
+            <span class="paper-list-num">01.</span>
+            <span>[First item — short and actionable.]</span>
+          </div>
+          <div class="paper-list-item">
+            <span class="paper-list-num">02.</span>
+            <span>[Second item — adds a little more context.]</span>
+          </div>
+          <div class="paper-list-item">
+            <span class="paper-list-num">03.</span>
+            <span>[Third item — the counter-intuitive or memorable one.]</span>
+          </div>
+        </div>
+
+        <span class="date-hand">[note or date]</span>
+
+      </div>
+    </div>
+    <span class="bg-brand">[BRAND]</span>
+  </div>
+
+
+  <!-- ══ SLIDE 4 · POINT 3 ════════════════════════════════════════
+       EDIT: brand-hand, eyebrow, title (with <mark>), body text    -->
+  <div class="slide" id="s4">
+    <div class="paper-back-2"></div>
+    <div class="paper-back-1"></div>
+    <div class="paper-top">
+      <div class="clip"></div>
+      <div class="paper-inner">
+
+        <span class="brand-hand">[brand name]</span>
+
+        <span class="paper-eyebrow">[Section 3 — e.g. "The Insight"]</span>
+
+        <!-- EDIT: title with optional highlighted word -->
+        <p class="title-stamp">
+          [Point three with<br>a <mark>[highlighted]</mark><br>word.]
+        </p>
+
+        <!-- EDIT: body paragraph -->
+        <p class="paper-body">
+          [Body paragraph for point three. Make this the most memorable or surprising of the three. End with a strong sentence.]
+        </p>
+
+        <span class="date-hand">[note or date]</span>
+
+      </div>
+    </div>
+    <span class="bg-brand">[BRAND]</span>
+  </div>
+
+
+  <!-- ══ SLIDE 5 · STAT ═══════════════════════════════════════════
+       EDIT: brand-hand, eyebrow, big-hand number (Caveat, orange),
+             title-stamp description, date-hand                     -->
+  <div class="slide" id="s5">
+    <div class="paper-back-2"></div>
+    <div class="paper-back-1"></div>
+    <div class="paper-top">
+      <div class="clip"></div>
+      <div class="paper-inner">
+
+        <span class="brand-hand">[brand name]</span>
+
+        <span class="paper-eyebrow">[The Number]</span>
+
+        <!-- EDIT: big handwritten number in Caveat (orange) -->
+        <span class="big-hand">[42%]</span>
+
+        <!-- EDIT: typewriter description of the stat -->
+        <p class="title-stamp" style="font-size:60px;">
+          [Short description<br>of what this means.]
+        </p>
+
+        <!-- EDIT: 2-sentence body for context -->
+        <p class="paper-body">
+          [Where this number comes from and why it matters to the reader right now.]
+        </p>
+
+        <span class="date-hand">[source or date]</span>
+
+      </div>
+    </div>
+    <span class="bg-brand">[BRAND]</span>
+  </div>
+
+
+  <!-- ══ SLIDE 6 · QUOTE ══════════════════════════════════════════
+       EDIT: brand-hand, eyebrow, paper-quote text (≤ 20 words),
+             attribution date-hand                                  -->
+  <div class="slide" id="s6">
+    <div class="paper-back-2"></div>
+    <div class="paper-back-1"></div>
+    <div class="paper-top">
+      <div class="clip"></div>
+      <div class="paper-inner">
+
+        <span class="brand-hand">[brand name]</span>
+
+        <span class="paper-eyebrow">[Quote / Perspective]</span>
+
+        <!-- EDIT: Lora italic quote — keep ≤ 20 words -->
+        <p class="paper-quote">
+          "[Your most quotable line from this piece. Make it something worth writing down.]"
+        </p>
+
+        <!-- EDIT: attribution — name, role, date, or source -->
+        <span class="date-hand">— [attribution]</span>
+
+      </div>
+    </div>
+    <span class="bg-brand">[BRAND]</span>
+  </div>
+
+
+  <!-- ══ SLIDE 7 · SUMMARY / CHECKLIST ════════════════════════════
+       EDIT: brand-hand, title-stamp, 3 checklist items             -->
+  <div class="slide" id="s7">
+    <div class="paper-back-2"></div>
+    <div class="paper-back-1"></div>
+    <div class="paper-top">
+      <div class="clip"></div>
+      <div class="paper-inner">
+
+        <span class="brand-hand">[brand name]</span>
+
+        <!-- EDIT: summary title -->
+        <p class="title-stamp">[The quick<br>summary.]</p>
+
+        <!-- EDIT: 3 checklist items — what the reader learned or should do -->
+        <div class="checklist">
+          <div class="check-item">
+            <span class="check-mark">✓</span>
+            <span>[First takeaway — what they now know.]</span>
+          </div>
+          <div class="check-item">
+            <span class="check-mark">✓</span>
+            <span>[Second takeaway — what they should do differently.]</span>
+          </div>
+          <div class="check-item">
+            <span class="check-mark">✓</span>
+            <span>[Third takeaway — the memorable conclusion.]</span>
+          </div>
+        </div>
+
+        <span class="date-hand">[note]</span>
+
+      </div>
+    </div>
+    <span class="bg-brand">[BRAND]</span>
+  </div>
+
+
+  <!-- ══ SLIDE 8 · CTA ════════════════════════════════════════════
+       EDIT: brand-hand, CTA title-stamp, paper-body follow pitch,
+             close-line, bg-brand                                   -->
+  <div class="slide" id="s8">
+    <div class="paper-back-2"></div>
+    <div class="paper-back-1"></div>
+    <div class="paper-top">
+      <div class="clip"></div>
+      <div class="paper-inner">
+
+        <span class="brand-hand">[brand name]</span>
+
+        <!-- EDIT: CTA title — what you want them to do -->
+        <p class="title-stamp">
+          [If this helped,<br><mark>[follow me]</mark><br>for more.]
+        </p>
+
+        <!-- EDIT: 2-sentence follow pitch -->
+        <p class="paper-body">
+          [One sentence about what you post and why it's worth following. Second sentence with a gentle ask.]
+        </p>
+
+        <!-- EDIT: handwritten sign-off -->
+        <span class="date-hand">[— Your Name, Date]</span>
+
+        <!-- EDIT: closing bold line — short and punchy -->
+        <p class="close-line">[See you there.]</p>
+
+      </div>
+    </div>
+    <!-- EDIT: brand label on green background -->
+    <span class="bg-brand">[BRAND]</span>
+  </div>
+
+</div><!-- /viewer -->
+
+<div class="controls">
+  <button class="nav-btn" id="prev" aria-label="Previous">
+    <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4L6 8.5L11 13"/></svg>
+  </button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">1 / 8</span>
+  <button class="nav-btn" id="next" aria-label="Next">
+    <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4L11 8.5L6 13"/></svg>
+  </button>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const dotsEl = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  let cur = 0;
+  const N = slides.length;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+
+  function go(idx) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = ((idx % N) + N) % N;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counter.textContent = (cur + 1) + ' / ' + N;
+  }
+
+  document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+  document.getElementById('next').addEventListener('click', () => go(cur + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  go(cur - 1);
+    if (e.key === 'ArrowRight') go(cur + 1);
+  });
+
+  let tx = 0;
+  const vw = document.getElementById('viewer');
+  vw.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  vw.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) go(dx < 0 ? cur + 1 : cur - 1);
+  }, { passive: true });
+</script>
+
+</body>
+</html>

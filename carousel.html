@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sora is Dead — LinkedIn Carousel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Lora:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & TOKENS ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:  #F0EDE5;
+  --dark:   #111110;
+  --orange: #E05828;
+  --white:  #FAFAF8;
+  --display: 'Barlow Condensed', sans-serif;
+  --body:   'DM Sans', sans-serif;
+  --serif:  'Lora', serif;
+  /* Slide canvas */
+  --sw: 1080px;
+  --sh: 1350px;
+  --scale: 0.5;
+}
+
+body {
+  background: #161616;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 28px;
+  font-family: var(--body);
+}
+
+/* ─── VIEWER ───────────────────────────────────────────────────────── */
+.page-label {
+  color: rgba(255,255,255,0.3);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.viewer {
+  position: relative;
+  width:  calc(var(--sw) * var(--scale));   /* 540px */
+  height: calc(var(--sh) * var(--scale));   /* 675px */
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 48px 96px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.06);
+  cursor: default;
+}
+
+/* Each slide is drawn at 1080×1350, scaled to 540×675 */
+.slide {
+  position: absolute;
+  inset: 0;
+  width:  var(--sw);
+  height: var(--sh);
+  transform: scale(var(--scale));
+  transform-origin: top left;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* ─── CONTROLS ─────────────────────────────────────────────────────── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s, border-color 0.18s, transform 0.12s;
+}
+.nav-btn:hover  { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.35); }
+.nav-btn:active { transform: scale(0.93); }
+.nav-btn svg    { width: 17px; height: 17px; }
+
+.dots { display: flex; gap: 7px; }
+.dot  {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  border: none; cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.dot.active { background: var(--orange); transform: scale(1.4); }
+
+.counter {
+  color: rgba(255,255,255,0.45);
+  font-size: 13px; font-weight: 500;
+  min-width: 44px; text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* ─── SHARED SLIDE PARTS ────────────────────────────────────────────── */
+.si {                        /* slide-inner */
+  width: 100%; height: 100%;
+  padding: 72px;
+  display: flex; flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 2px solid currentColor;
+  border-radius: 100px;
+  padding: 10px 24px;
+  font-family: var(--body);
+  font-size: 22px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+}
+.tag svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+.circle-btn {
+  width: 84px; height: 84px; border-radius: 50%;
+  border: 2.5px solid currentColor;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.circle-btn svg { width: 34px; height: 34px; }
+
+.star { font-size: 50px; line-height: 1; }
+.brand {
+  font-family: var(--body); font-size: 20px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5;
+}
+.source {
+  font-family: var(--body); font-size: 22px; font-weight: 300;
+  letter-spacing: 0.02em; opacity: 0.42;
+}
+
+/* ─── SLIDE 1 · CREAM COVER ─────────────────────────────────────────── */
+#s1 { background: var(--cream); color: var(--dark); }
+#s1 .si { justify-content: space-between; }
+
+#s1 .top  { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+
+#s1 .headline {
+  font-family: var(--display);
+  font-size: 196px; font-weight: 900;
+  line-height: 0.88; text-transform: uppercase;
+  letter-spacing: -0.015em;
+  margin-top: 44px;
+}
+
+#s1 .circled {
+  position: relative; display: inline-block;
+}
+#s1 .circled svg {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 114%; height: 136%;
+  pointer-events: none;
+}
+
+#s1 .bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+
+#s1 .tagline {
+  font-family: var(--serif); font-style: italic;
+  font-size: 31px; line-height: 1.52;
+  max-width: 360px; text-align: right; opacity: 0.62;
+}
+
+/* ─── SLIDE 2 · DARK · 6 MONTHS DATA ───────────────────────────────── */
+#s2 { background: var(--dark); color: var(--white); }
+#s2 .si { justify-content: space-between; }
+
+#s2 .top { display: flex; justify-content: space-between; align-items: flex-start; }
+#s2 .top-left { display: flex; align-items: center; gap: 16px; }
+
+#s2 .big-num {
+  font-family: var(--display);
+  font-size: 336px; font-weight: 900;
+  line-height: 0.83; letter-spacing: -0.025em;
+}
+#s2 .big-num .u { color: var(--orange); }
+
+#s2 .data-row { display: flex; align-items: center; gap: 24px; margin-top: 18px; }
+#s2 .data-lbl {
+  font-family: var(--serif); font-style: italic; font-size: 54px;
+}
+
+#s2 .caption {
+  font-family: var(--body); font-size: 34px; font-weight: 300;
+  line-height: 1.5; max-width: 840px;
+}
+#s2 .caption strong { color: var(--orange); font-weight: 600; }
+
+/* ─── SLIDE 3 · DARK · DISNEY $1B ──────────────────────────────────── */
+#s3 { background: var(--dark); color: var(--white); }
+#s3 .si { justify-content: space-between; }
+
+#s3 .top { display: flex; justify-content: space-between; align-items: flex-start; }
+#s3 .top-left { display: flex; align-items: center; gap: 16px; }
+
+#s3 .big-num {
+  font-family: var(--display);
+  font-size: 284px; font-weight: 900;
+  line-height: 0.86; letter-spacing: -0.02em;
+}
+#s3 .big-num .u { color: var(--orange); }
+
+#s3 .data-row { display: flex; align-items: center; gap: 24px; margin-top: 20px; }
+#s3 .data-lbl {
+  font-family: var(--serif); font-style: italic; font-size: 54px;
+}
+
+#s3 .bottom { display: flex; flex-direction: column; gap: 16px; }
+#s3 .caption {
+  font-family: var(--body); font-size: 34px; font-weight: 300;
+  line-height: 1.5; max-width: 840px;
+}
+
+/* ─── SLIDE 4 · ORANGE · COMPUTE COST CARD ─────────────────────────── */
+#s4 { background: var(--orange); color: var(--white); }
+#s4 .si { justify-content: space-between; }
+#s4 .top { display: flex; justify-content: space-between; align-items: flex-start; }
+
+#s4 .card {
+  background: var(--white); color: var(--dark);
+  border-radius: 32px; padding: 80px;
+  flex: 1; margin: 44px 0;
+  display: flex; flex-direction: column; justify-content: center; gap: 40px;
+}
+#s4 .card .eyebrow {
+  font-family: var(--body); font-size: 26px; font-weight: 500;
+  letter-spacing: 0.07em; text-transform: uppercase; opacity: 0.42;
+}
+#s4 .card .stmt {
+  font-family: var(--display); font-size: 94px; font-weight: 900;
+  line-height: 0.9; text-transform: uppercase; letter-spacing: -0.01em;
+}
+#s4 .card .body {
+  font-family: var(--body); font-size: 34px; font-weight: 300;
+  line-height: 1.52; opacity: 0.7;
+}
+#s4 .card .cta-row { display: flex; align-items: center; gap: 24px; margin-top: 8px; }
+#s4 .card .cta-row .lbl {
+  font-family: var(--body); font-size: 26px; font-weight: 500;
+  letter-spacing: 0.07em; text-transform: uppercase;
+}
+#s4 .bottom { display: flex; justify-content: space-between; align-items: center; }
+
+/* ─── SLIDE 5 · DARK · DEEPFAKES ───────────────────────────────────── */
+#s5 { background: var(--dark); color: var(--white); }
+#s5 .si { justify-content: space-between; }
+#s5 .top { display: flex; justify-content: space-between; align-items: flex-start; }
+#s5 .top-left { display: flex; align-items: center; gap: 16px; }
+
+#s5 .headline {
+  font-family: var(--display); font-size: 130px; font-weight: 900;
+  line-height: 0.9; text-transform: uppercase; letter-spacing: -0.015em;
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  padding-top: 32px;
+}
+#s5 .headline .ac { color: var(--orange); }
+
+#s5 .caption {
+  font-family: var(--body); font-size: 34px; font-weight: 300;
+  line-height: 1.52; max-width: 840px;
+}
+#s5 .caption strong { font-weight: 600; }
+#s5 .bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+
+/* ─── SLIDE 6 · CREAM · PIVOT ───────────────────────────────────────── */
+#s6 { background: var(--cream); color: var(--dark); }
+#s6 .si { justify-content: space-between; }
+#s6 .top { display: flex; justify-content: space-between; align-items: flex-start; }
+
+#s6 .eyebrow {
+  font-family: var(--body); font-size: 26px; font-weight: 500;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  opacity: 0.42; margin-top: 56px;
+}
+#s6 .headline {
+  font-family: var(--display); font-size: 142px; font-weight: 900;
+  line-height: 0.88; text-transform: uppercase; letter-spacing: -0.015em;
+  margin-top: 20px;
+}
+#s6 .body {
+  font-family: var(--body); font-size: 36px; font-weight: 300;
+  line-height: 1.55; opacity: 0.65; max-width: 840px;
+  margin-top: 44px;
+}
+#s6 .bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+#s6 .tagline {
+  font-family: var(--serif); font-style: italic;
+  font-size: 30px; line-height: 1.5; opacity: 0.6; text-align: right;
+}
+
+/* ─── SLIDE 7 · ORANGE · WHO WINS ───────────────────────────────────── */
+#s7 { background: var(--orange); color: var(--white); }
+#s7 .si { justify-content: space-between; }
+#s7 .top { display: flex; justify-content: space-between; align-items: flex-start; }
+
+#s7 .card {
+  background: var(--white); color: var(--dark);
+  border-radius: 32px; padding: 80px;
+  flex: 1; margin: 40px 0;
+  display: flex; flex-direction: column; justify-content: center; gap: 36px;
+}
+#s7 .card .eyebrow {
+  font-family: var(--body); font-size: 26px; font-weight: 500;
+  letter-spacing: 0.07em; text-transform: uppercase; opacity: 0.4;
+}
+#s7 .card .stmt {
+  font-family: var(--display); font-size: 118px; font-weight: 900;
+  line-height: 0.88; text-transform: uppercase; letter-spacing: -0.01em;
+}
+#s7 .card .body {
+  font-family: var(--body); font-size: 34px; font-weight: 300;
+  line-height: 1.52; opacity: 0.68;
+}
+#s7 .card .cta-row { display: flex; align-items: center; gap: 24px; margin-top: 8px; }
+#s7 .card .cta-row .lbl {
+  font-family: var(--body); font-size: 24px; font-weight: 500;
+  letter-spacing: 0.07em; text-transform: uppercase;
+}
+#s7 .bottom { display: flex; justify-content: space-between; align-items: center; }
+
+/* ─── SLIDE 8 · DARK · OPINION ──────────────────────────────────────── */
+#s8 { background: var(--dark); color: var(--white); }
+#s8 .si { justify-content: space-between; }
+#s8 .top { display: flex; justify-content: space-between; align-items: flex-start; }
+#s8 .top-left { display: flex; align-items: center; gap: 16px; }
+
+#s8 .eyebrow {
+  font-family: var(--body); font-size: 24px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.35;
+  margin-top: 52px;
+}
+#s8 .headline {
+  font-family: var(--display); font-size: 132px; font-weight: 900;
+  line-height: 0.88; text-transform: uppercase; letter-spacing: -0.015em;
+  margin-top: 20px;
+}
+#s8 .headline .ac { color: var(--orange); }
+
+#s8 .opinion {
+  font-family: var(--serif); font-style: italic;
+  font-size: 42px; line-height: 1.55; font-weight: 400;
+  opacity: 0.82; max-width: 900px; margin-top: 36px;
+}
+
+#s8 .cta-block {
+  border-top: 1.5px solid rgba(255,255,255,0.12);
+  padding-top: 48px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+#s8 .cta-text {
+  font-family: var(--body); font-size: 32px; font-weight: 300;
+  line-height: 1.55; opacity: 0.65; max-width: 620px;
+}
+#s8 .cta-text strong { color: var(--orange); font-weight: 600; opacity: 1; }
+</style>
+</head>
+<body>
+
+<p class="page-label">LinkedIn Carousel &nbsp;·&nbsp; Sora Shutdown &nbsp;·&nbsp; 8 Slides</p>
+
+<div class="viewer" id="viewer">
+
+  <!-- ═══ SLIDE 1 · COVER ══════════════════════════════════════════════ -->
+  <div class="slide active" id="s1">
+    <div class="si">
+
+      <div class="top">
+        <span class="tag" style="color:var(--dark); border-color:var(--dark);">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 13L13 4M13 4H7M13 4V10"/>
+          </svg>
+          AI NEWS
+        </span>
+        <span class="tag" style="color:var(--dark); border-color:var(--dark);">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 13L13 4M13 4H7M13 4V10"/>
+          </svg>
+          BREAKING
+        </span>
+      </div>
+
+      <div class="headline">
+        <div>OPENAI</div>
+        <div>JUST</div>
+        <div class="circled">
+          KILLED
+          <!-- hand-drawn oval around "KILLED" -->
+          <svg viewBox="0 0 420 140" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+            <path d="M 22,70 C 12,12 108,-4 210,4 C 312,12 402,22 400,70 C 398,118 308,142 210,138 C 112,134 32,128 22,70"
+                  stroke="#E05828" stroke-width="9" stroke-linecap="round" fill="none" opacity="0.92"/>
+          </svg>
+        </div>
+        <div>SORA.</div>
+      </div>
+
+      <div class="bottom">
+        <div class="circle-btn" style="color:var(--dark);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 17H26M18 9L26 17L18 25"/>
+          </svg>
+        </div>
+        <p class="tagline">The most hyped AI app<br>of 2025 lasted 6 months.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 2 · DATA: 6 MONTHS ════════════════════════════════════ -->
+  <div class="slide" id="s2">
+    <div class="si">
+
+      <div class="top">
+        <div class="top-left">
+          <span class="star" style="color:var(--orange);">✳</span>
+          <span class="brand">[LAUNCH GRAVEYARD]</span>
+        </div>
+        <span class="brand">MAR 2026</span>
+      </div>
+
+      <div>
+        <div class="big-num">6<span class="u">M</span></div>
+        <div class="data-row">
+          <div class="circle-btn" style="color:var(--orange); border-color:var(--orange);">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 17H26M18 9L26 17L18 25"/>
+            </svg>
+          </div>
+          <span class="data-lbl">Months alive.</span>
+        </div>
+      </div>
+
+      <p class="caption">
+        Sora launched <strong>September 2025.</strong><br>
+        OpenAI killed it <strong>March 2026.</strong><br>
+        Six months. No runway. No return.
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 3 · DATA: DISNEY $1B ══════════════════════════════════ -->
+  <div class="slide" id="s3">
+    <div class="si">
+
+      <div class="top">
+        <div class="top-left">
+          <span class="star" style="color:var(--orange);">✳</span>
+          <span class="brand">[THE DEAL THAT DIED]</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="big-num">$1<span class="u">B</span></div>
+        <div class="data-row">
+          <div class="circle-btn" style="color:var(--orange); border-color:var(--orange);">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 17H26M18 9L26 17L18 25"/>
+            </svg>
+          </div>
+          <span class="data-lbl">Disney.</span>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <p class="caption">
+          Was about to invest in OpenAI.<br>
+          The deal never closed. Disney walked.<br>
+          No money ever changed hands.
+        </p>
+        <p class="source" style="margin-top:20px;">Source: Variety, March 24 2026</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 4 · ORANGE · COMPUTE COST ════════════════════════════ -->
+  <div class="slide" id="s4">
+    <div class="si">
+
+      <div class="top">
+        <span class="tag" style="color:var(--white); border-color:var(--white);">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 13L13 4M13 4H7M13 4V10"/>
+          </svg>
+          WHY IT DIED
+        </span>
+        <div class="circle-btn" style="color:var(--white); border-color:var(--white);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M26 17H8M16 9L8 17L16 25"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="eyebrow">Reason #1</p>
+        <p class="stmt">AI VIDEO<br>IS BRUTALLY<br>EXPENSIVE.</p>
+        <p class="body">
+          OpenAI cited "growing compute demand" as the trade-off that killed it. Video burns GPU resources at a scale that's hard to justify without clear revenue.
+        </p>
+        <div class="cta-row">
+          <div class="circle-btn" style="color:var(--dark); border-color:var(--dark); width:68px; height:68px;">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 17H26M18 9L26 17L18 25"/>
+            </svg>
+          </div>
+          <span class="lbl">COMPUTE COST</span>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <span class="star" style="color:var(--white);">✳</span>
+        <span class="brand" style="color:var(--white);">[AI NEWS]</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 5 · DARK · DEEPFAKES ══════════════════════════════════ -->
+  <div class="slide" id="s5">
+    <div class="si">
+
+      <div class="top">
+        <div class="top-left">
+          <span class="star" style="color:var(--orange);">✳</span>
+          <span class="brand">[THE SAFETY PROBLEM]</span>
+        </div>
+      </div>
+
+      <div class="headline">
+        <div>DEEPFAKES</div>
+        <div>OF <span class="ac">MLK JR.</span></div>
+        <div>WENT VIRAL.</div>
+      </div>
+
+      <p class="caption">
+        Robin Williams too. Both their <strong>daughters publicly<br>
+        asked people to stop.</strong><br>
+        The safety problem had no easy fix.
+      </p>
+
+      <div class="bottom">
+        <p class="source">Source: NPR, March 25 2026</p>
+        <div class="circle-btn" style="color:var(--orange); border-color:var(--orange);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 17H26M18 9L26 17L18 25"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 6 · CREAM · THE PIVOT ════════════════════════════════ -->
+  <div class="slide" id="s6">
+    <div class="si">
+
+      <div class="top">
+        <span class="tag" style="color:var(--dark); border-color:var(--dark);">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 13L13 4M13 4H7M13 4V10"/>
+          </svg>
+          WHAT'S NEXT
+        </span>
+        <span class="tag" style="color:var(--dark); border-color:var(--dark);">STRATEGY</span>
+      </div>
+
+      <p class="eyebrow">The Pivot</p>
+      <p class="headline">NOT DEAD.<br>REDIRECTED.</p>
+      <p class="body">
+        OpenAI said the Sora team moves to robotics and physical-world simulation research. The video app is gone. The underlying technology lives on.
+      </p>
+
+      <div class="bottom">
+        <div class="circle-btn" style="color:var(--dark);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 17H26M18 9L26 17L18 25"/>
+          </svg>
+        </div>
+        <p class="tagline">The research<br>continues.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 7 · ORANGE · WHO WINS ════════════════════════════════ -->
+  <div class="slide" id="s7">
+    <div class="si">
+
+      <div class="top">
+        <span class="tag" style="color:var(--white); border-color:var(--white);">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 13L13 4M13 4H7M13 4V10"/>
+          </svg>
+          AI VIDEO RACE
+        </span>
+        <div class="circle-btn" style="color:var(--white); border-color:var(--white);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M26 17H8M16 9L8 17L16 25"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="eyebrow">Still Standing</p>
+        <p class="stmt">RUNWAY.<br>KLING.<br>VEO.</p>
+        <p class="body">
+          Lower compute costs. Clearer monetisation. The players who built for sustainability — not hype — will survive.
+        </p>
+        <div class="cta-row">
+          <div class="circle-btn" style="color:var(--orange); border-color:var(--orange); width:68px; height:68px;">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 17H26M18 9L26 17L18 25"/>
+            </svg>
+          </div>
+          <span class="lbl">THE RACE JUST GOT REAL</span>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <span class="star" style="color:var(--white);">✳</span>
+        <span class="brand" style="color:var(--white);">[AI NEWS]</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 8 · DARK · OPINION + CTA ═════════════════════════════ -->
+  <div class="slide" id="s8">
+    <div class="si">
+
+      <div class="top">
+        <div class="top-left">
+          <span class="star" style="color:var(--orange);">✳</span>
+          <span class="brand">[MY TAKE]</span>
+        </div>
+        <span class="brand">ADITYA</span>
+      </div>
+
+      <p class="eyebrow">Opinion</p>
+      <p class="headline">THIS WAS<br><span class="ac">ALWAYS</span><br>COMING.</p>
+
+      <p class="opinion">
+        "We hype every AI launch like it'll last forever. Sora was beautiful, brutally expensive, and fundamentally unsolved. It won't be the last AI product to die this way."
+      </p>
+
+      <div class="cta-block">
+        <p class="cta-text">
+          If you'd rather read <strong>honest AI takes</strong> than hype — follow.<br>I post weekly.
+        </p>
+        <div class="circle-btn" style="color:var(--orange); border-color:var(--orange);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 17H26M18 9L26 17L18 25"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /viewer -->
+
+<!-- Controls -->
+<div class="controls">
+  <button class="nav-btn" id="prev" aria-label="Previous">
+    <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 4L6 8.5L11 13"/>
+    </svg>
+  </button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">1 / 8</span>
+  <button class="nav-btn" id="next" aria-label="Next">
+    <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 4L11 8.5L6 13"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const dotsEl = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  let cur = 0;
+  const N = slides.length;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+
+  function go(idx) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = ((idx % N) + N) % N;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counter.textContent = (cur + 1) + ' / ' + N;
+  }
+
+  document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+  document.getElementById('next').addEventListener('click', () => go(cur + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  go(cur - 1);
+    if (e.key === 'ArrowRight') go(cur + 1);
+  });
+
+  // Swipe support
+  let tx = 0;
+  const vw = document.getElementById('viewer');
+  vw.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  vw.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) go(dx < 0 ? cur + 1 : cur - 1);
+  }, { passive: true });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE 3 — ORANGE / CARD  ·  8-slide carousel
+  Palette: terracotta/orange bg · white card surface · dark card text
+  Fonts:   Barlow Condensed (display) · DM Sans (body/UI) · Lora italic (statements)
+
+  All 8 slides use the same white card-on-orange structure.
+  The card interior layout changes per slide.
+
+  HOW TO EDIT:
+  1. Change design tokens in :root for whole-carousel retheme.
+  2. Search <!-- EDIT --> — every content placeholder is marked.
+  3. Each slide header comment lists exactly what to change.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template 3 — Orange Card · 8 Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Lora:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+
+/* ── DESIGN TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg:       #E05828;   /* EDIT: slide background */
+  --card-bg:  #FAFAF8;   /* EDIT: white card surface */
+  --text:     #111110;   /* EDIT: primary text on card */
+  --muted:    rgba(17,17,16,0.42);
+  --bg-text:  rgba(250,250,248,0.72); /* text/icons on bg (not on card) */
+
+  /* EDIT: font sizes */
+  --sz-eyebrow:   24px;
+  --sz-display:   94px;   /* card main statement (Barlow) */
+  --sz-serif:     64px;   /* Lora italic statement */
+  --sz-body:      34px;   /* card body text */
+  --sz-cta:       28px;   /* CTA pill text */
+  --sz-brand:     20px;
+  --sz-stat:     160px;   /* big data number on card */
+}
+
+/* ── RESET ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── SHELL ──────────────────────────────────────────────────────── */
+body {
+  background: #161616;
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 48px 24px; gap: 28px;
+  font-family: 'DM Sans', sans-serif;
+}
+.page-label {
+  color: rgba(255,255,255,0.28);
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+}
+
+/* ── VIEWER ─────────────────────────────────────────────────────── */
+.viewer {
+  position: relative;
+  width: 540px; height: 675px;
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 48px 96px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.06);
+  cursor: default;
+}
+
+/* ── SLIDE ──────────────────────────────────────────────────────── */
+.slide {
+  position: absolute; inset: 0;
+  width: 1080px; height: 1350px;
+  transform: scale(0.5); transform-origin: top left;
+  background: var(--bg);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* ── SLIDE INNER ────────────────────────────────────────────────── */
+.si {
+  width: 100%; height: 100%;
+  padding: 72px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ── STRUCTURAL ROWS ────────────────────────────────────────────── */
+.top    { display: flex; justify-content: space-between; align-items: flex-start; }
+.bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+
+/* ── BG-LEVEL ELEMENTS (on orange, not on card) ─────────────────── */
+.circle-btn-bg {
+  width: 84px; height: 84px; border-radius: 50%;
+  border: 2.5px solid var(--bg-text); color: var(--bg-text);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.circle-btn-bg svg { width: 34px; height: 34px; }
+
+.tag-bg {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 2px solid var(--bg-text); border-radius: 100px;
+  padding: 11px 26px; color: var(--bg-text);
+  font-size: 22px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  white-space: nowrap; line-height: 1;
+}
+.tag-bg svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+.star-bg  { font-size: 54px; line-height: 1; color: var(--bg-text); }
+.brand-bg {
+  font-size: var(--sz-brand); font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--bg-text);
+}
+
+/* ── CARD ────────────────────────────────────────────────────────── */
+.card {
+  background: var(--card-bg); border-radius: 40px;
+  padding: 80px 80px 88px;
+  flex: 1; margin: 40px 0;
+  display: flex; flex-direction: column;
+  justify-content: center; gap: 36px;
+  color: var(--text);
+}
+
+/* ── CARD COMPONENTS ────────────────────────────────────────────── */
+.eyebrow {
+  font-size: var(--sz-eyebrow); font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+}
+
+/* Barlow Condensed bold display line on card */
+.card-display {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-display); font-weight: 900;
+  line-height: 0.9; text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+/* Lora italic statement on card */
+.card-serif {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: var(--sz-serif); line-height: 1.28;
+}
+
+/* Body text inside card */
+.card-body {
+  font-size: var(--sz-body); font-weight: 300; line-height: 1.52;
+}
+
+/* Big stat number on card */
+.card-stat {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-stat); font-weight: 900;
+  line-height: 0.83; letter-spacing: -0.025em;
+}
+.card-stat .unit { color: var(--bg); }
+
+/* Row with circle arrow + label (reason slides) */
+.cta-row { display: flex; align-items: center; gap: 24px; margin-top: 8px; }
+.cta-row-lbl {
+  font-size: 26px; font-weight: 500;
+  letter-spacing: 0.07em; text-transform: uppercase;
+}
+.circle-btn-card {
+  width: 68px; height: 68px; border-radius: 50%;
+  border: 2.5px solid currentColor;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.circle-btn-card svg { width: 28px; height: 28px; }
+
+/* Full-width CTA pill inside card */
+.cta-pill {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  background: var(--bg); border-radius: 100px;
+  padding: 24px 28px 24px 48px; gap: 24px;
+  margin-top: 8px;
+}
+.cta-pill-text {
+  font-size: var(--sz-cta); font-weight: 500;
+  color: var(--card-bg); letter-spacing: 0.01em;
+}
+.cta-pill-arrow {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--card-bg);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: var(--text);
+}
+.cta-pill-arrow svg { width: 30px; height: 30px; }
+
+/* Divider inside card */
+.card-divider {
+  height: 1.5px; background: rgba(17,17,16,0.1);
+  margin: 8px 0;
+}
+
+/* Attribution on card */
+.card-attribution {
+  font-size: 24px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+}
+
+/* ── CONTROLS ───────────────────────────────────────────────────── */
+.controls { display: flex; align-items: center; gap: 20px; }
+.nav-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s, border-color 0.18s, transform 0.12s;
+}
+.nav-btn:hover  { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.35); }
+.nav-btn:active { transform: scale(0.93); }
+.nav-btn svg { width: 17px; height: 17px; }
+.dots { display: flex; gap: 7px; }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.18); border: none; cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.dot.active { background: var(--card-bg); transform: scale(1.4); }
+.counter {
+  color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 500;
+  min-width: 44px; text-align: center; letter-spacing: 0.05em;
+}
+
+</style>
+</head>
+<body>
+
+<p class="page-label">Template 3 — Orange / Card &nbsp;·&nbsp; 8 Slides</p>
+
+<div class="viewer" id="viewer">
+
+  <!-- ══ SLIDE 1 · COVER CARD ══════════════════════════════════════
+       EDIT: top tag (or delete for clean look),
+             eyebrow, card-display headline (2–3 lines),
+             CTA pill text, bottom brand                            -->
+  <div class="slide active" id="s1">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: top tag — delete this span for a minimal look -->
+        <span class="tag-bg">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          [CATEGORY]
+        </span>
+        <!-- back arrow, top-right -->
+        <div class="circle-btn-bg">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 17H8M16 25L8 17L16 9"/></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- EDIT: eyebrow label above headline -->
+        <span class="eyebrow">[EYEBROW — e.g. "The Big Picture"]</span>
+
+        <!-- EDIT: 2–3 line cover headline (Barlow Condensed, bold) -->
+        <p class="card-display">
+          [YOUR COVER<br>HEADLINE<br>HERE.]
+        </p>
+
+        <!-- EDIT: CTA pill text (3–5 words) -->
+        <div class="cta-pill">
+          <span class="cta-pill-text">[Swipe to learn more]</span>
+          <div class="cta-pill-arrow">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <span class="star-bg">✳</span>
+        <!-- EDIT: brand name or date, bottom-right -->
+        <span class="brand-bg">[BRAND NAME]</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 2 · REASON 1 ════════════════════════════════════════
+       EDIT: top tag, eyebrow ("Reason #1"), card-display (2–3 lines),
+             card-body text, cta-row label                          -->
+  <div class="slide" id="s2">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: context tag -->
+        <span class="tag-bg">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          [WHY IT MATTERS]
+        </span>
+        <div class="circle-btn-bg">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 17H8M16 25L8 17L16 9"/></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- EDIT: eyebrow — e.g. "Reason #1" -->
+        <span class="eyebrow">[REASON #1]</span>
+
+        <!-- EDIT: 2–3 line bold display statement -->
+        <p class="card-display">
+          [POINT ONE<br>STATED<br>BOLDLY.]
+        </p>
+
+        <!-- EDIT: supporting body text (2–3 sentences) -->
+        <p class="card-body">
+          [Explain the reason in plain language. Give one piece of evidence or context. Make it feel real, not abstract.]
+        </p>
+
+        <!-- EDIT: cta-row label — key theme word in caps -->
+        <div class="cta-row">
+          <div class="circle-btn-card" style="color:var(--text);border-color:var(--text);">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+          </div>
+          <span class="cta-row-lbl">[KEY THEME]</span>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <span class="star-bg">✳</span>
+        <span class="brand-bg">[BRAND]</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 3 · REASON 2 ════════════════════════════════════════
+       EDIT: eyebrow ("Reason #2"), display statement, body, label  -->
+  <div class="slide" id="s3">
+    <div class="si">
+
+      <div class="top">
+        <span class="tag-bg">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          [WHY IT MATTERS]
+        </span>
+        <div class="circle-btn-bg">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 17H8M16 25L8 17L16 9"/></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="eyebrow">[REASON #2]</span>
+        <p class="card-display">
+          [SECOND<br>POINT<br>HERE.]
+        </p>
+        <p class="card-body">
+          [Supporting body text for reason two. Two to three sentences that give evidence and context.]
+        </p>
+        <div class="cta-row">
+          <div class="circle-btn-card" style="color:var(--text);border-color:var(--text);">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+          </div>
+          <span class="cta-row-lbl">[KEY THEME]</span>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <span class="star-bg">✳</span>
+        <span class="brand-bg">[BRAND]</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 4 · REASON 3 ════════════════════════════════════════
+       EDIT: eyebrow ("Reason #3"), display statement, body, label  -->
+  <div class="slide" id="s4">
+    <div class="si">
+
+      <div class="top">
+        <span class="tag-bg">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          [WHY IT MATTERS]
+        </span>
+        <div class="circle-btn-bg">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 17H8M16 25L8 17L16 9"/></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="eyebrow">[REASON #3]</span>
+        <p class="card-display">
+          [THIRD<br>POINT<br>HERE.]
+        </p>
+        <p class="card-body">
+          [Supporting body text for reason three. Land the most memorable or surprising of the three.]
+        </p>
+        <div class="cta-row">
+          <div class="circle-btn-card" style="color:var(--text);border-color:var(--text);">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+          </div>
+          <span class="cta-row-lbl">[KEY THEME]</span>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <span class="star-bg">✳</span>
+        <span class="brand-bg">[BRAND]</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 5 · DATA CARD ═══════════════════════════════════════
+       EDIT: top tag, eyebrow, big number, unit (.unit = bg color),
+             body text                                               -->
+  <div class="slide" id="s5">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: context tag -->
+        <span class="tag-bg">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          [THE NUMBER]
+        </span>
+        <div class="circle-btn-bg">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 17H8M16 25L8 17L16 9"/></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- EDIT: eyebrow label -->
+        <span class="eyebrow">[THE DATA]</span>
+
+        <!-- EDIT: big stat number + unit (unit gets bg/orange color via .unit) -->
+        <div class="card-stat">[NUM]<span class="unit">[U]</span></div>
+
+        <div class="card-divider"></div>
+
+        <!-- EDIT: 2–3 sentence body explaining the stat -->
+        <p class="card-body">
+          [What this number means. Where it comes from. Why the reader should care about it right now.]
+        </p>
+      </div>
+
+      <div class="bottom">
+        <span class="star-bg">✳</span>
+        <span class="brand-bg">[BRAND]</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 6 · QUOTE CARD ══════════════════════════════════════
+       EDIT: eyebrow, Lora italic quote (≤ 20 words), attribution   -->
+  <div class="slide" id="s6">
+    <div class="si">
+
+      <div class="top">
+        <span class="tag-bg">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          [CONTEXT]
+        </span>
+        <div class="circle-btn-bg">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 17H8M16 25L8 17L16 9"/></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- EDIT: eyebrow -->
+        <span class="eyebrow">[QUOTE / PERSPECTIVE]</span>
+
+        <!-- EDIT: large Lora italic quote — keep ≤ 20 words -->
+        <p class="card-serif">
+          "[Your memorable quote in large italic serif. Make it something worth screenshotting.]"
+        </p>
+
+        <div class="card-divider"></div>
+
+        <!-- EDIT: attribution — name, title, or source -->
+        <span class="card-attribution">— [NAME / SOURCE]</span>
+      </div>
+
+      <div class="bottom">
+        <span class="star-bg">✳</span>
+        <span class="brand-bg">[BRAND]</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 7 · TAKEAWAY CARD ═══════════════════════════════════
+       EDIT: eyebrow, serif statement, body text, CTA pill          -->
+  <div class="slide" id="s7">
+    <div class="si">
+
+      <div class="top">
+        <span class="tag-bg">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          [TAKEAWAY]
+        </span>
+        <div class="circle-btn-bg">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 17H8M16 25L8 17L16 9"/></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- EDIT: eyebrow -->
+        <span class="eyebrow">[THE LESSON]</span>
+
+        <!-- EDIT: 1–2 line Lora italic takeaway statement -->
+        <p class="card-serif">
+          "[Your key takeaway as a memorable italic serif sentence.]"
+        </p>
+
+        <!-- EDIT: supporting body text -->
+        <p class="card-body">
+          [One or two sentences that explain why this is the takeaway. What should the reader do differently after reading this?]
+        </p>
+
+        <!-- EDIT: CTA pill text -->
+        <div class="cta-pill">
+          <span class="cta-pill-text">[Read the full thread]</span>
+          <div class="cta-pill-arrow">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <span class="star-bg">✳</span>
+        <span class="brand-bg">[BRAND]</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 8 · CTA CARD ════════════════════════════════════════
+       EDIT: eyebrow, card-display (2 lines), body follow pitch,
+             CTA pill text, bottom brand                            -->
+  <div class="slide" id="s8">
+    <div class="si">
+
+      <div class="top">
+        <div class="circle-btn-bg">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M26 17H8M16 25L8 17L16 9"/></svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- EDIT: eyebrow — e.g. "If you found this useful" -->
+        <span class="eyebrow">[IF YOU FOUND THIS USEFUL]</span>
+
+        <!-- EDIT: CTA headline, 2 lines -->
+        <p class="card-display">
+          [FOLLOW<br>FOR MORE.]
+        </p>
+
+        <!-- EDIT: 1–2 sentence follow pitch -->
+        <p class="card-body">
+          [One sentence about what you post and why it's worth following. Keep it honest and specific.]
+        </p>
+
+        <!-- EDIT: CTA pill text — keep short (3–5 words) -->
+        <div class="cta-pill">
+          <span class="cta-pill-text">[Follow · Comment · Share]</span>
+          <div class="cta-pill-arrow">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <span class="star-bg">✳</span>
+        <!-- EDIT: your name / brand -->
+        <span class="brand-bg">[YOUR NAME]</span>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /viewer -->
+
+<div class="controls">
+  <button class="nav-btn" id="prev" aria-label="Previous">
+    <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4L6 8.5L11 13"/></svg>
+  </button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">1 / 8</span>
+  <button class="nav-btn" id="next" aria-label="Next">
+    <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4L11 8.5L6 13"/></svg>
+  </button>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const dotsEl = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  let cur = 0;
+  const N = slides.length;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+
+  function go(idx) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = ((idx % N) + N) % N;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counter.textContent = (cur + 1) + ' / ' + N;
+  }
+
+  document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+  document.getElementById('next').addEventListener('click', () => go(cur + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  go(cur - 1);
+    if (e.key === 'ArrowRight') go(cur + 1);
+  });
+
+  let tx = 0;
+  const vw = document.getElementById('viewer');
+  vw.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  vw.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) go(dx < 0 ? cur + 1 : cur - 1);
+  }, { passive: true });
+</script>
+
+</body>
+</html>

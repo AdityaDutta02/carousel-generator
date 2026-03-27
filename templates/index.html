@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE GALLERY — index.html
+  Browse all 4 carousel templates with live previews.
+  Click any template to open it in a new tab.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carousel Templates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:    #111110;
+  --card:  #1C1C1B;
+  --border: rgba(255,255,255,0.08);
+  --text:  #FAFAF8;
+  --muted: rgba(250,250,248,0.45);
+  --accent: #E05828;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100dvh;
+  padding: 64px 48px;
+}
+
+header {
+  margin-bottom: 56px;
+}
+
+header h1 {
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+header p {
+  margin-top: 14px;
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 520px;
+  line-height: 1.6;
+}
+
+/* ── GRID ───────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 32px;
+}
+
+/* ── CARD ────────────────────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+}
+
+/* Thumbnail — iframe scaled inside a fixed-height box */
+.thumb {
+  position: relative;
+  width: 100%;
+  height: 375px; /* = 300px * (5/4) aspect — matches 1080×1350 ratio */
+  overflow: hidden;
+  background: #0a0a0a;
+  border-bottom: 1px solid var(--border);
+}
+.thumb iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 600px;   /* slightly wider than card to fill it */
+  height: 750px;  /* 600 * (5/4) */
+  transform: scale(0.5);
+  transform-origin: top left;
+  border: none;
+  pointer-events: none; /* clicks go to the <a> card, not the iframe */
+  background: transparent;
+}
+
+/* Card body */
+.card-body {
+  padding: 24px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.card-tag .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.card-name {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.card-desc {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.card-link {
+  margin-top: auto;
+  padding-top: 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-link svg {
+  width: 14px; height: 14px;
+}
+
+/* ── FOOTER ──────────────────────────────────────────────────── */
+footer {
+  margin-top: 64px;
+  font-size: 13px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Carousel Templates</h1>
+  <p>4 reusable LinkedIn carousel designs. Each is 1080 × 1350 px with EDIT-marked placeholders. Click to open and customise.</p>
+</header>
+
+<div class="grid">
+
+  <!-- Template 1 — Editorial -->
+  <a class="card" href="template-1-editorial.html" target="_blank">
+    <div class="thumb">
+      <iframe src="template-1-editorial.html" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-tag">
+        <span class="dot" style="background:#F0EDE5;border:1.5px solid rgba(255,255,255,0.2)"></span>
+        Cream · Editorial
+      </span>
+      <span class="card-name">Template 1 — Editorial</span>
+      <p class="card-desc">Large bold display type on a cream background. Hand-drawn orange circle accent around one word. Two pill tag buttons, circle arrow, italic serif tagline.</p>
+      <span class="card-link">
+        Open template
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11L11 3M11 3H6M11 3V8"/>
+        </svg>
+      </span>
+    </div>
+  </a>
+
+  <!-- Template 2 — Data -->
+  <a class="card" href="template-2-data.html" target="_blank">
+    <div class="thumb">
+      <iframe src="template-2-data.html" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-tag">
+        <span class="dot" style="background:#111110;border:1.5px solid rgba(255,255,255,0.2)"></span>
+        Dark · Stat Number
+      </span>
+      <span class="card-name">Template 2 — Data</span>
+      <p class="card-desc">Near-black background with an oversized number. Colored unit suffix, asterisk brand tag, italic serif label beside a circle arrow, and a highlighted body line.</p>
+      <span class="card-link">
+        Open template
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11L11 3M11 3H6M11 3V8"/>
+        </svg>
+      </span>
+    </div>
+  </a>
+
+  <!-- Template 3 — Card -->
+  <a class="card" href="template-3-card.html" target="_blank">
+    <div class="thumb">
+      <iframe src="template-3-card.html" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-tag">
+        <span class="dot" style="background:#E05828;"></span>
+        Orange · Card
+      </span>
+      <span class="card-name">Template 3 — Card</span>
+      <p class="card-desc">Warm terracotta background. White rounded card centered on slide with an italic serif statement and a full-width pill CTA button. Asterisk + brand at bottom.</p>
+      <span class="card-link">
+        Open template
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11L11 3M11 3H6M11 3V8"/>
+        </svg>
+      </span>
+    </div>
+  </a>
+
+  <!-- Template 4 — Notebook -->
+  <a class="card" href="template-4-notebook.html" target="_blank">
+    <div class="thumb">
+      <iframe src="template-4-notebook.html" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+    </div>
+    <div class="card-body">
+      <span class="card-tag">
+        <span class="dot" style="background:#C4EA58;border:1.5px solid rgba(255,255,255,0.2)"></span>
+        Yellow-Green · Notebook
+      </span>
+      <span class="card-name">Template 4 — Notebook</span>
+      <p class="card-desc">Yellow-green background with stacked paper layers. Dot-grid top paper, CSS paperclip, handwritten Caveat font, Special Elite typewriter title, and highlighter text effect.</p>
+      <span class="card-link">
+        Open template
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11L11 3M11 3H6M11 3V8"/>
+        </svg>
+      </span>
+    </div>
+  </a>
+
+</div>
+
+<footer>
+  4 templates · 1080 × 1350 px each · Edit placeholders marked with <!-- EDIT --> in each file
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<!--
+  HDFC BANK — NOTEBOOK CAROUSEL
+  Template 4 visual system: yellow-green bg, stacked paper layers,
+  dot-grid, paperclip, Caveat / Special Elite / Barlow Condensed fonts.
+  7 slides · 1080 × 1350 px · keyboard + swipe nav
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HDFC Bank — Your NAV is Bleeding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Caveat:wght@400;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+/* ── RESET + TOKENS ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #C4EA58;   /* yellow-green */
+  --paper:      #FAFAF8;   /* top paper */
+  --paper-back: #EEE9DA;   /* back paper layers */
+  --text:       #111110;
+  --blue:       #1A3FBE;   /* handwritten date / annotations */
+  --red:        #C0392B;   /* loss / negative emphasis */
+  --mark:       #C4EA58;   /* inline highlighter */
+  --muted:      rgba(17,17,16,0.45);
+  --clip:       #8B8B83;
+}
+
+body {
+  background: #1a1a1a;
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 20px; padding: 40px 24px;
+  font-family: 'DM Sans', sans-serif;
+  user-select: none;
+}
+
+/* ── VIEWER ──────────────────────────────────────────────────── */
+.viewer {
+  position: relative;
+  width: 540px; height: 675px;
+  border-radius: 16px; overflow: hidden;
+  box-shadow: 0 56px 96px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+/* ── SLIDES ──────────────────────────────────────────────────── */
+.slide {
+  position: absolute; inset: 0;
+  width: 1080px; height: 1350px;
+  transform: scale(0.5); transform-origin: top left;
+  background: var(--bg);
+  overflow: hidden;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* ── SHARED PAPER STRUCTURE ──────────────────────────────────── */
+/* Back layers — peeking behind */
+.pb2 {
+  position: absolute;
+  left: 70px; top: 190px;
+  width: 940px; height: 1020px;
+  background: var(--paper-back);
+  border-radius: 28px;
+  transform: rotate(3.2deg);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+}
+.pb1 {
+  position: absolute;
+  left: 70px; top: 190px;
+  width: 940px; height: 1020px;
+  background: var(--paper-back);
+  border-radius: 28px;
+  transform: rotate(-1.8deg);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+}
+/* Top paper — dot grid */
+.pt {
+  position: absolute;
+  left: 70px; top: 190px;
+  width: 940px; height: 1020px;
+  background-color: var(--paper);
+  background-image: radial-gradient(circle, rgba(17,17,16,0.18) 1.5px, transparent 1.5px);
+  background-size: 40px 40px;
+  border-radius: 28px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  padding: 80px 84px 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ── PAPERCLIP ───────────────────────────────────────────────── */
+.clip {
+  position: absolute;
+  top: -56px; left: 50%; transform: translateX(-50%);
+  width: 54px; height: 116px;
+}
+.clip::before, .clip::after {
+  content: '';
+  position: absolute;
+  left: 50%; transform: translateX(-50%);
+  border-radius: 100px;
+  border: 5px solid var(--clip);
+  background: transparent;
+}
+.clip::before { width: 54px; height: 116px; top: 0; }
+.clip::after  { width: 34px; height: 80px;  top: 20px; background: var(--paper); }
+
+/* ── SHARED TYPE STYLES ──────────────────────────────────────── */
+.hand       { font-family: 'Caveat', cursive; }
+.stamp      { font-family: 'Special Elite', cursive; }
+.bold-close { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; }
+
+mark {
+  background: var(--mark);
+  color: var(--text);
+  padding: 2px 8px;
+  border-radius: 4px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* ── BG LABEL (green bg, bottom) ─────────────────────────────── */
+.bg-label {
+  position: absolute;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 28px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(17,17,16,0.4);
+}
+
+/* ── NAV CHROME ──────────────────────────────────────────────── */
+.nav {
+  display: flex; align-items: center; gap: 20px;
+}
+.nav-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer; color: rgba(255,255,255,0.55);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.nav-btn svg { width: 18px; height: 18px; }
+.counter {
+  font-size: 13px; font-weight: 500; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.3); min-width: 48px; text-align: center;
+}
+.dots { display: flex; gap: 8px; }
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,0.2); cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.dot.active { background: #C4EA58; transform: scale(1.3); }
+</style>
+</head>
+<body>
+
+<div class="viewer" id="viewer">
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 1 — COVER
+  ════════════════════════════════════════════════════════════ -->
+  <div class="slide active" id="s0">
+    <div class="pb2"></div>
+    <div class="pb1"></div>
+    <div class="pt">
+      <div class="clip"></div>
+
+      <!-- Handwritten brand -->
+      <span class="hand" style="font-size:46px;font-weight:700;color:var(--text);">hdfc decoded.</span>
+
+      <!-- Main statement -->
+      <p class="stamp" style="font-size:86px;line-height:1.2;color:var(--text);">
+        Your NAV is already<br><mark>bleeding.</mark>
+      </p>
+
+      <!-- Blue annotation -->
+      <span class="hand" style="font-size:42px;color:var(--blue);">March 2026 · here's why ↓</span>
+
+      <!-- Bold close line -->
+      <p class="bold-close" style="font-size:116px;line-height:0.9;color:var(--text);">52-week<br>low.</p>
+    </div>
+
+    <!-- BG label bottom right -->
+    <span class="bg-label" style="bottom:64px;right:80px;">HDFC Bank · ₹745</span>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 2 — WHAT HAPPENED
+  ════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="s1">
+    <div class="pb2"></div>
+    <div class="pb1"></div>
+    <div class="pt">
+
+      <span class="hand" style="font-size:40px;font-weight:700;color:var(--muted);">what broke it</span>
+
+      <p class="stamp" style="font-size:74px;line-height:1.22;color:var(--text);">
+        A chairman quit.<br>Three execs <mark>fired.</mark>
+      </p>
+
+      <!-- Typewriter list -->
+      <div style="display:flex;flex-direction:column;gap:28px;">
+        <div style="display:flex;gap:20px;align-items:flex-start;">
+          <span class="hand" style="font-size:36px;color:var(--blue);flex-shrink:0;line-height:1.3;">①</span>
+          <p class="stamp" style="font-size:38px;line-height:1.4;color:var(--text);">Atanu Chakraborty, part-time chairman — resigned. Cited "values and ethics."</p>
+        </div>
+        <div style="display:flex;gap:20px;align-items:flex-start;">
+          <span class="hand" style="font-size:36px;color:var(--blue);flex-shrink:0;line-height:1.3;">②</span>
+          <p class="stamp" style="font-size:38px;line-height:1.4;color:var(--text);">3 senior executives terminated. Alleged mis-selling of Credit Suisse AT1 bonds.</p>
+        </div>
+      </div>
+
+      <!-- Date -->
+      <span class="hand" style="font-size:40px;color:var(--blue);">March 19, 2026</span>
+    </div>
+
+    <span class="bg-label" style="bottom:64px;left:80px;">HDFC BANK</span>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 3 — DATA: THE FALL
+  ════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="s2">
+    <div class="pb2"></div>
+    <div class="pb1"></div>
+    <div class="pt" style="justify-content:flex-start;gap:60px;">
+
+      <span class="hand" style="font-size:40px;font-weight:700;color:var(--muted);">the damage</span>
+
+      <!-- Big number -->
+      <div>
+        <p class="bold-close" style="font-size:300px;line-height:0.85;color:var(--text);letter-spacing:-0.03em;">5.3<span style="color:var(--red);">%</span></p>
+        <p class="stamp" style="font-size:52px;line-height:1.3;color:var(--text);margin-top:20px;">single-session crash</p>
+      </div>
+
+      <!-- Annotation -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <p class="hand" style="font-size:44px;color:var(--blue);">steepest fall in over two years.</p>
+        <p class="stamp" style="font-size:38px;color:var(--muted);line-height:1.4;">Nifty Bank: 3rd-worst<br>March since 2008.</p>
+      </div>
+    </div>
+
+    <span class="bg-label" style="bottom:64px;right:80px;">March 19</span>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 4 — DATA: MARKET CAP WIPED
+  ════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="s3">
+    <div class="pb2"></div>
+    <div class="pb1"></div>
+    <div class="pt" style="justify-content:flex-start;gap:56px;">
+
+      <span class="hand" style="font-size:40px;font-weight:700;color:var(--muted);">total wipeout</span>
+
+      <!-- Big rupee figure -->
+      <div>
+        <p class="hand" style="font-size:68px;font-weight:700;color:var(--red);">₹1.35 lakh crore</p>
+        <p class="stamp" style="font-size:58px;line-height:1.2;color:var(--text);margin-top:12px;">market cap — <mark>gone.</mark></p>
+      </div>
+
+      <!-- Two stats side by side -->
+      <div style="display:flex;gap:60px;">
+        <div>
+          <p class="bold-close" style="font-size:110px;line-height:0.85;color:var(--text);">~350</p>
+          <p class="stamp" style="font-size:36px;color:var(--muted);margin-top:8px;">Nifty points<br>dragged down</p>
+        </div>
+        <div style="width:3px;background:rgba(17,17,16,0.12);border-radius:2px;margin:8px 0;"></div>
+        <div>
+          <p class="bold-close" style="font-size:110px;line-height:0.85;color:var(--text);">4</p>
+          <p class="stamp" style="font-size:36px;color:var(--muted);margin-top:8px;">trading<br>sessions</p>
+        </div>
+      </div>
+
+      <span class="hand" style="font-size:40px;color:var(--blue);">11.83% weight in Nifty50.</span>
+    </div>
+
+    <span class="bg-label" style="bottom:64px;left:80px;">NIFTY IMPACT</span>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 5 — YOUR EXPOSURE
+  ════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="s4">
+    <div class="pb2"></div>
+    <div class="pb1"></div>
+    <div class="pt">
+
+      <span class="hand" style="font-size:40px;font-weight:700;color:var(--red);">your SIP isn't safe</span>
+
+      <p class="stamp" style="font-size:80px;line-height:1.18;color:var(--text);">
+        <mark>740+</mark> mutual fund schemes own this stock.
+      </p>
+
+      <!-- Ownership breakdown -->
+      <div style="display:flex;gap:0;border:2px solid rgba(17,17,16,0.12);border-radius:16px;overflow:hidden;">
+        <div style="flex:1;padding:44px 40px;border-right:2px solid rgba(17,17,16,0.12);">
+          <p class="bold-close" style="font-size:96px;line-height:0.9;color:var(--text);">47.7%</p>
+          <p class="stamp" style="font-size:34px;color:var(--muted);margin-top:10px;">FIIs</p>
+        </div>
+        <div style="flex:1;padding:44px 40px;">
+          <p class="bold-close" style="font-size:96px;line-height:0.9;color:var(--text);">26.6%</p>
+          <p class="stamp" style="font-size:34px;color:var(--muted);margin-top:10px;">Mutual Funds</p>
+        </div>
+      </div>
+
+      <span class="hand" style="font-size:40px;color:var(--blue);">Large-cap or flexi-cap SIP? You're in this.</span>
+    </div>
+
+    <span class="bg-label" style="bottom:64px;right:80px;">EXPOSURE</span>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 6 — THE REAL PLAY
+  ════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="s5">
+    <div class="pb2"></div>
+    <div class="pb1"></div>
+    <div class="pt">
+
+      <span class="hand" style="font-size:40px;font-weight:700;color:var(--muted);">but here's the thing</span>
+
+      <p class="stamp" style="font-size:84px;line-height:1.18;color:var(--text);">
+        Governance shock.<br><mark>Not</mark> a business<br>collapse.
+      </p>
+
+      <!-- Analyst calls -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:28px 36px;border:2.5px solid rgba(17,17,16,0.15);border-radius:16px;">
+          <span class="stamp" style="font-size:42px;color:var(--text);">Jefferies</span>
+          <span class="bold-close" style="font-size:52px;color:#1A7A4A;">BUY ↑</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:28px 36px;border:2.5px solid rgba(17,17,16,0.15);border-radius:16px;">
+          <span class="stamp" style="font-size:42px;color:var(--text);">Motilal Oswal</span>
+          <span class="bold-close" style="font-size:52px;color:#1A7A4A;">BUY ↑</span>
+        </div>
+      </div>
+
+      <p class="hand" style="font-size:40px;color:var(--blue);">Recoveries get built in sessions like these.</p>
+    </div>
+
+    <span class="bg-label" style="bottom:64px;left:80px;">ANALYST VIEW</span>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       SLIDE 7 — OPINION + CTA
+  ════════════════════════════════════════════════════════════ -->
+  <div class="slide" id="s6">
+    <div class="pb2"></div>
+    <div class="pb1"></div>
+    <div class="pt">
+      <div class="clip"></div>
+
+      <span class="hand" style="font-size:46px;font-weight:700;color:var(--text);">my take.</span>
+
+      <p class="stamp" style="font-size:88px;line-height:1.15;color:var(--text);">
+        I'm not<br>panicking.<br>I'm <mark>watching.</mark>
+      </p>
+
+      <p class="stamp" style="font-size:42px;line-height:1.5;color:var(--muted);">
+        The fundamentals are intact.<br>The management story isn't — yet.
+      </p>
+
+      <!-- CTA question -->
+      <div style="background:var(--text);border-radius:20px;padding:44px 52px;">
+        <p class="hand" style="font-size:52px;color:var(--bg);font-weight:700;line-height:1.3;">What's your HDFC exposure right now — holding or trimming?</p>
+        <p class="bold-close" style="font-size:44px;color:rgba(196,234,88,0.6);margin-top:16px;">Comment below. ↓</p>
+      </div>
+    </div>
+
+    <span class="bg-label" style="bottom:64px;right:80px;">follow for more</span>
+  </div>
+
+</div><!-- /.viewer -->
+
+<!-- ── NAV ──────────────────────────────────────────────────── -->
+<div class="nav">
+  <button class="nav-btn" id="prev" aria-label="Previous">
+    <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 4L6 9L11 14"/>
+    </svg>
+  </button>
+
+  <div class="dots" id="dots">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <span class="counter" id="counter">1 / 7</span>
+
+  <button class="nav-btn" id="next" aria-label="Next">
+    <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 4L12 9L7 14"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+const slides  = Array.from(document.querySelectorAll('.slide'));
+const dotsEl  = document.getElementById('dots');
+const counter = document.getElementById('counter');
+const N       = slides.length;
+let cur       = 0;
+
+function go(idx) {
+  slides[cur].classList.remove('active');
+  dotsEl.children[cur].classList.remove('active');
+  cur = ((idx % N) + N) % N;
+  slides[cur].classList.add('active');
+  dotsEl.children[cur].classList.add('active');
+  counter.textContent = (cur + 1) + ' / ' + N;
+}
+
+document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+document.getElementById('next').addEventListener('click', () => go(cur + 1));
+
+Array.from(dotsEl.children).forEach((d, i) => d.addEventListener('click', () => go(i)));
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(cur + 1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(cur - 1);
+});
+
+// Touch / swipe
+let tx = 0;
+const v = document.getElementById('viewer');
+v.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+v.addEventListener('touchend',   e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1));
+});
+</script>
+</body>
+</html>
