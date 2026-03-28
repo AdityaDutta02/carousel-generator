@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Slider } from '@/components/ui/slider'
 import type { GeneratedCopy } from '@/types/carousel'
 
 // SlideCountConfig bundles value + setter so ScriptPreviewProps stays under the 5-prop limit.
@@ -75,18 +76,23 @@ export function ScriptPreview({ copy, onCopyChange, onConfirm, slideCount }: Scr
         <p className="text-lg font-semibold text-white">{copy.hook}</p>
       </div>
       <Separator className="bg-zinc-800" />
-      <div className="flex items-center gap-4">
-        <p className="text-sm text-zinc-400">
-          Slides: <span className="text-white font-medium">{slideCount.value}</span>
-        </p>
-        <input
-          type="range"
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-zinc-400">Number of slides</p>
+          <span className="text-white font-semibold tabular-nums">{slideCount.value}</span>
+        </div>
+        <Slider
+          value={[slideCount.value]}
+          onValueChange={(values) => slideCount.onChange(values[0])}
           min={3}
           max={15}
-          value={slideCount.value}
-          onChange={(e) => slideCount.onChange(Number(e.target.value))}
-          className="flex-1 accent-orange-500"
+          step={1}
+          className="[&_[data-slot=slider-range]]:bg-orange-500 [&_[data-slot=slider-thumb]]:border-orange-500"
         />
+        <div className="flex justify-between text-xs text-zinc-600">
+          <span>3</span>
+          <span>15</span>
+        </div>
       </div>
       <div className="space-y-4">
         {copy.slides.map((slide, i) => (

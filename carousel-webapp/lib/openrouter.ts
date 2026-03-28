@@ -3,20 +3,17 @@ import type { UserContext } from './pocketbase'
 import type { GeneratedCopy } from '@/types/carousel'
 import type { SlotDefinition } from '@/types/template'
 
-let client: OpenAI | null = null
-
 function getClient(): OpenAI {
-  if (!client) {
-    client = new OpenAI({
-      baseURL: 'https://openrouter.ai/api/v1',
-      apiKey: process.env.OPENROUTER_API_KEY ?? '',
-      defaultHeaders: {
-        'HTTP-Referer': 'https://carousel-generator.app',
-        'X-Title': 'Carousel Generator',
-      },
-    })
-  }
-  return client
+  const apiKey = process.env.OPENROUTER_API_KEY ?? ''
+  if (!apiKey) throw new Error('OPENROUTER_API_KEY is not set')
+  return new OpenAI({
+    baseURL: 'https://openrouter.ai/api/v1',
+    apiKey,
+    defaultHeaders: {
+      'HTTP-Referer': 'https://carousel-generator.app',
+      'X-Title': 'Carousel Generator',
+    },
+  })
 }
 
 export const CHEAP_MODEL =

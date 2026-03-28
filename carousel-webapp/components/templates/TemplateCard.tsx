@@ -53,10 +53,13 @@ export function TemplateCard({ template, onSelect, onPublished, isSelected }: Te
             src={template.htmlFileUrl}
             title={template.name}
             style={{
-              width: '540px',
-              height: '675px',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '1080px',
+              height: '1350px',
               transformOrigin: 'top left',
-              transform: 'scale(0.5)',
+              transform: 'scale(0.25)',
               border: 'none',
               pointerEvents: 'none',
             }}
