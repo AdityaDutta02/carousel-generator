@@ -5,6 +5,8 @@ import {
   resolveSlotValue,
   getGlobalSlots,
   getSlideSlots,
+  injectAllSlotValues,
+  activateSlide,
 } from './template-engine'
 import type { SchemaJson } from '@/types/template'
 import type { Slide } from '@/types/carousel'
@@ -72,5 +74,81 @@ describe('resolveSlotValue', () => {
   it('returns default when slot has no value', () => {
     const emptySlide: Slide = { index: 0, slots: {} }
     expect(resolveSlotValue(schema.slots[1], emptySlide)).toBe('#E05828')
+  })
+})
+
+// ── injectAllSlotValues ──────────────────────────────────────────────────
+describe('injectAllSlotValues', () => {
+  const MULTI_SLIDE_HTML = `<html><head></head><body>
+<div class="slide active"><span data-slot="s1_headline">PH1</span></div>
+<div class="slide"><span data-slot="s2_headline">PH2</span></div>
+<div class="slide"><span data-slot="s3_headline">PH3</span></div>
+</body></html>`
+
+  const SCHEMA: SchemaJson = {
+    version: 1,
+    slots: [
+      { id: 's1_headline', slide: 1, selector: "[data-slot='s1_headline']", type: 'text', label: 'S1 Headline' },
+      { id: 's2_headline', slide: 2, selector: "[data-slot='s2_headline']", type: 'text', label: 'S2 Headline' },
+      { id: 's3_headline', slide: 3, selector: "[data-slot='s3_headline']", type: 'text', label: 'S3 Headline' },
+    ],
+  }
+
+  const SLIDES: Slide[] = [
+    { index: 0, slots: { s1_headline: 'Hello Slide 1' } },
+    { index: 1, slots: { s2_headline: 'Hello Slide 2' } },
+    { index: 2, slots: { s3_headline: 'Hello Slide 3' } },
+  ]
+
+  it('injects values for all slides in one pass', () => {
+    const result = injectAllSlotValues(MULTI_SLIDE_HTML, SCHEMA, SLIDES)
+    expect(result).toContain('Hello Slide 1')
+    expect(result).toContain('Hello Slide 2')
+    expect(result).toContain('Hello Slide 3')
+  })
+
+  it('does not leave placeholder text for filled slots', () => {
+    const result = injectAllSlotValues(MULTI_SLIDE_HTML, SCHEMA, SLIDES)
+    expect(result).not.toContain('PH1')
+    expect(result).not.toContain('PH2')
+    expect(result).not.toContain('PH3')
+  })
+
+  it('leaves placeholder when slide has no slot value', () => {
+    const sparseSlides: Slide[] = [
+      { index: 0, slots: {} },
+      { index: 1, slots: {} },
+      { index: 2, slots: {} },
+    ]
+    const result = injectAllSlotValues(MULTI_SLIDE_HTML, SCHEMA, sparseSlides)
+    expect(result).toContain('PH1')
+  })
+})
+
+// ── activateSlide ────────────────────────────────────────────────────────
+describe('activateSlide', () => {
+  const HTML = `<html><body>
+<div class="slide active">SLIDE1</div>
+<div class="slide">SLIDE2</div>
+<div class="slide">SLIDE3</div>
+</body></html>`
+
+  it('moves active class to the specified slide index', () => {
+    const result = activateSlide(HTML, 1)
+    const matches = [...result.matchAll(/class="slide(?: active)?"/g)]
+    expect(matches[0][0]).toBe('class="slide"')
+    expect(matches[1][0]).toBe('class="slide active"')
+    expect(matches[2][0]).toBe('class="slide"')
+  })
+
+  it('keeps slide 0 active when index is 0', () => {
+    const result = activateSlide(HTML, 0)
+    const matches = [...result.matchAll(/class="slide(?: active)?"/g)]
+    expect(matches[0][0]).toBe('class="slide active"')
+  })
+
+  it('returns html unchanged when slideIndex is out of range', () => {
+    const result = activateSlide(HTML, 99)
+    expect(result).toBe(HTML)
   })
 })
