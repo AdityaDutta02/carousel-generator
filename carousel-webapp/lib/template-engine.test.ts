@@ -151,4 +151,28 @@ describe('activateSlide', () => {
     const result = activateSlide(HTML, 99)
     expect(result).toBe(HTML)
   })
+
+  it('handles slides with additional classes correctly', () => {
+    const htmlWithExtras = `<html><body>
+<div class="slide active foo">SLIDE1</div>
+<div class="slide bar">SLIDE2</div>
+</body></html>`
+    const result = activateSlide(htmlWithExtras, 1)
+    expect(result).toContain('class="slide foo"')
+    expect(result).toContain('class="slide bar active"')
+  })
+
+  it('does not match non-slide elements that contain the word slide', () => {
+    const htmlWithNonSlide = `<html><body>
+<div class="slide active">SLIDE1</div>
+<div class="slide">SLIDE2</div>
+<button class="nav-slide-btn">prev</button>
+</body></html>`
+    const result = activateSlide(htmlWithNonSlide, 1)
+    // Only 2 .slide divs — activating index 1 should work correctly
+    const matches = [...result.matchAll(/class="slide(?:\s[^"]*)?"/g)]
+    expect(matches).toHaveLength(2)
+    expect(matches[1][0]).toContain('active')
+    expect(result).toContain('class="nav-slide-btn"') // unchanged
+  })
 })

@@ -137,7 +137,7 @@ export function injectAllSlotValues(
  */
 export function activateSlide(html: string, slideIndex: number): string {
   // Collect all class="..." attributes that contain the word 'slide'
-  const slidePattern = /class="([^"]*\bslide\b[^"]*)"/g
+  const slidePattern = /class="(slide(?:\s[^"]*)?)"/g
   const matches = [...html.matchAll(slidePattern)]
 
   if (slideIndex >= matches.length || slideIndex < 0) return html
@@ -194,9 +194,11 @@ export function injectBridgeScript(html: string, schema: SchemaJson): string {
       applyUpdate(e.data.slotId, e.data.value);
     }
     if (e.data.type === 'SWITCH_SLIDE') {
+      var targetIndex = Number(e.data.index);
+      if (!Number.isFinite(targetIndex) || targetIndex < 0) return;
       var allSlides = document.querySelectorAll('.slide');
       allSlides.forEach(function(s, idx) {
-        if (idx === e.data.index) {
+        if (idx === targetIndex) {
           s.classList.add('active');
         } else {
           s.classList.remove('active');
