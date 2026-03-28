@@ -62,6 +62,15 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
         signal: abortRef.current.signal,
       })
 
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({ error: 'AI service error. Please try again.' }))
+        setMessages(prev => [
+          ...prev,
+          { role: 'assistant', content: (errBody as { error?: string }).error ?? 'Something went wrong. Please try again.' },
+        ])
+        return
+      }
+
       const reader = res.body!.getReader()
       const decoder = new TextDecoder()
 

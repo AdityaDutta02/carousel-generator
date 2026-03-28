@@ -27,7 +27,13 @@ export async function POST(req: NextRequest): Promise<Response> {
     messages: Array<{ role: 'user' | 'assistant'; content: string }>
   }
 
-  const stream = await streamCopyGeneration(body.messages, userContext)
+  let stream: ReadableStream<string>
+  try {
+    stream = await streamCopyGeneration(body.messages, userContext)
+  } catch (err) {
+    console.error('[generate-copy] OpenRouter error:', err)
+    return NextResponse.json({ error: 'AI service error. Please try again.' }, { status: 502 })
+  }
 
   return new Response(stream.pipeThrough(new TextEncoderStream()), {
     headers: {

@@ -40,13 +40,27 @@ export function TemplateCard({ template, onSelect, onPublished, isSelected }: Te
       }`}
       onClick={() => onSelect?.(template)}
     >
-      <div className="bg-zinc-900 aspect-[4/5] relative">
+      <div className="bg-zinc-900 aspect-[4/5] relative overflow-hidden">
         {template.thumbnailUrl ? (
           <Image
             src={template.thumbnailUrl}
             alt={template.name}
             fill
             className="object-cover"
+          />
+        ) : template.htmlFileUrl ? (
+          <iframe
+            src={template.htmlFileUrl}
+            title={template.name}
+            style={{
+              width: '540px',
+              height: '675px',
+              transformOrigin: 'top left',
+              transform: 'scale(0.37)',
+              border: 'none',
+              pointerEvents: 'none',
+            }}
+            sandbox="allow-same-origin"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-zinc-600 text-sm">

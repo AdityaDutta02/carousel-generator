@@ -103,11 +103,15 @@ export async function streamCopyGeneration(
 
   return new ReadableStream({
     async start(controller) {
-      for await (const chunk of stream) {
-        const delta = chunk.choices[0]?.delta?.content ?? ''
-        if (delta) controller.enqueue(delta)
+      try {
+        for await (const chunk of stream) {
+          const delta = chunk.choices[0]?.delta?.content ?? ''
+          if (delta) controller.enqueue(delta)
+        }
+        controller.close()
+      } catch (err) {
+        controller.error(err)
       }
-      controller.close()
     },
   })
 }
