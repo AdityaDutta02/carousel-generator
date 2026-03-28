@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { use } from 'react'
 import { useCarousel } from '@/hooks/useCarousel'
 import { useTemplateSchema } from '@/hooks/useTemplateSchema'
@@ -39,6 +39,7 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
         )?.[0] ?? 'instagram-portrait')
       : 'instagram-portrait')
   const previewRef = useRef<SlidePreviewHandle>(null)
+  const hasMountedRef = useRef(false)
   const templateId = carousel?.templateId ?? ''
   const { template, schema, templateHtml } = useTemplateSchema(templateId)
 
@@ -54,6 +55,10 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
   }, [])
 
   useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      return
+    }
     previewRef.current?.switchSlide(activeSlideIndex)
   }, [activeSlideIndex])
 
@@ -114,10 +119,13 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
 
   const activeCanvasWidth = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.width ?? 1080
   const activeCanvasHeight = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.height ?? 1350
-  const srcdoc = templateHtml && schema && carousel.slides.length > 0
-    ? buildSrcdoc(templateHtml, schema, carousel.slides, 0,
-        { canvasWidth: activeCanvasWidth, canvasHeight: activeCanvasHeight })
-    : `<html><body style="background:#1a1a1a;display:flex;align-items:center;justify-content:center;height:100vh;color:#666;font-family:sans-serif"><p>Select a template to start</p></body></html>`
+  const srcdoc = useMemo(() => {
+    if (!templateHtml || !schema || carousel.slides.length === 0) {
+      return `<html><body style="background:#1a1a1a;display:flex;align-items:center;justify-content:center;height:100vh;color:#666;font-family:sans-serif"><p>Select a template to start</p></body></html>`
+    }
+    return buildSrcdoc(templateHtml, schema, carousel.slides, 0,
+      { canvasWidth: activeCanvasWidth, canvasHeight: activeCanvasHeight })
+  }, [templateHtml, schema, carousel.slides, activeCanvasWidth, activeCanvasHeight])
 
   return (
     <div className="flex h-screen overflow-hidden">
