@@ -61,7 +61,7 @@ export function useExport(slideCount: number, title: string) {
       a.href = url
       a.download = buildZipFilename(title)
       a.click()
-      URL.revokeObjectURL(url)
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
 
       setIsExporting(false)
       setProgress(0)

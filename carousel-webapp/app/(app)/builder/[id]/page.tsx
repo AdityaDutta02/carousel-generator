@@ -31,7 +31,13 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
   const [activeSlideIndex, setActiveSlideIndex] = useState(0)
   const [activeSlot, setActiveSlot] = useState<SlotDefinition | null>(null)
   const [showTemplatePicker, setShowTemplatePicker] = useState(false)
-  const [canvasSizeKey, setCanvasSizeKey] = useState('instagram-portrait')
+  const [canvasSizeKeyOverride, setCanvasSizeKeyOverride] = useState<string | null>(null)
+  const canvasSizeKey = canvasSizeKeyOverride
+    ?? (carousel
+      ? (Object.entries(CANVAS_SIZES).find(
+          ([, size]) => size.width === carousel.canvasWidth && size.height === carousel.canvasHeight
+        )?.[0] ?? 'instagram-portrait')
+      : 'instagram-portrait')
   const previewRef = useRef<SlidePreviewHandle>(null)
   const templateId = carousel?.templateId ?? ''
   const { template, schema, templateHtml } = useTemplateSchema(templateId)
@@ -114,7 +120,7 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
           activeIndex={activeSlideIndex}
           onSelect={setActiveSlideIndex}
         />
-        <CanvasSizePicker selected={canvasSizeKey} onSelect={setCanvasSizeKey} />
+        <CanvasSizePicker selected={canvasSizeKey} onSelect={setCanvasSizeKeyOverride} />
         <Button variant="outline" size="sm" onClick={() => setShowTemplatePicker(true)}>
           Change Template
         </Button>

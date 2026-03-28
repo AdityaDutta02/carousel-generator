@@ -4,17 +4,28 @@ import { getPocketBase } from '@/lib/pocketbase'
 import type { Template, SchemaJson } from '@/types/template'
 
 export function useTemplateSchema(templateId: string) {
-  const [template, setTemplate] = useState<Template | null>(null)
-  const [schema, setSchema] = useState<SchemaJson | null>(null)
-  const [templateHtml, setTemplateHtml] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(Boolean(templateId))
+  const [state, setState] = useState<{
+    id: string
+    template: Template | null
+    schema: SchemaJson | null
+    templateHtml: string | null
+    isLoading: boolean
+  }>({
+    id: templateId,
+    template: null,
+    schema: null,
+    templateHtml: null,
+    isLoading: Boolean(templateId),
+  })
 
   useEffect(() => {
     if (!templateId) return
+    let cancelled = false
     const pb = getPocketBase()
     pb.collection('templates')
       .getOne(templateId)
       .then(record => {
+        if (cancelled) return undefined
         const t: Template = {
           id: record.id,
           name: record.name as string,
@@ -33,15 +44,26 @@ export function useTemplateSchema(templateId: string) {
               : [],
           slideCountDefault: (record.slide_count_default as number) || 5,
         }
-        setTemplate(t)
-        setSchema(t.schemaJson)
+        setState(prev => ({ ...prev, id: templateId, template: t, schema: t.schemaJson }))
         return fetch(`/api/template/${templateId}`)
       })
       .then(res => res?.text())
-      .then(html => { if (html) setTemplateHtml(html) })
+      .then(html => {
+        if (cancelled) return
+        if (html) setState(prev => ({ ...prev, id: templateId, templateHtml: html }))
+      })
       .catch(console.error)
-      .finally(() => setIsLoading(false))
+      .finally(() => {
+        if (!cancelled) setState(prev => (prev.id === templateId ? { ...prev, isLoading: false } : prev))
+      })
+    return () => { cancelled = true }
   }, [templateId])
+
+  const isCurrent = state.id === templateId
+  const template = isCurrent ? state.template : null
+  const schema = isCurrent ? state.schema : null
+  const templateHtml = isCurrent ? state.templateHtml : null
+  const isLoading = !isCurrent || state.isLoading
 
   return { template, schema, templateHtml, isLoading }
 }
