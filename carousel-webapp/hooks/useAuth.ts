@@ -41,14 +41,15 @@ async function runWithLoading(
 
 export function useAuth() {
   const pb = getPocketBase()
-  const [user, setUser] = useState<AuthUser | null>(() => getAuthUser(pb))
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    return pb.authStore.onChange(() => {
-      setUser(getAuthUser(pb))
-    })
+    // Read auth state client-side only so server and client initial render agree (null).
+    const syncUser = () => setUser(getAuthUser(pb))
+    syncUser()
+    return pb.authStore.onChange(syncUser)
   }, [pb])
 
   const login = useCallback(
