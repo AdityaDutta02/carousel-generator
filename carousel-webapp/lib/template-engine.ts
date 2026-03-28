@@ -56,7 +56,7 @@ export function injectSlotValues(
     if (slot.type === 'text') {
       const escapedId = slot.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
       result = result.replace(
-        new RegExp(`(<[^>]+data-slot="${escapedId}"[^>]*>)[^<]*(</[^>]+>)`, 'g'),
+        new RegExp(`(<[^>]+data-slot="${escapedId}"[^>]*>)[\\s\\S]*?(</[^>]+>)`, 'g'),
         `$1${escapeHtml(value)}$2`
       )
     } else if (slot.type === 'css_var' && slot.variable) {
