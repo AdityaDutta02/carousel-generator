@@ -26,10 +26,13 @@ export function useTemplateSchema(templateId: string) {
           thumbnailUrl: record.thumbnail
             ? pb.files.getURL(record, record.thumbnail as string)
             : '',
-          canvasWidth: record.canvas_width as number,
-          canvasHeight: record.canvas_height as number,
-          platformTags: (record.platform_tags as string[]) ?? [],
-          slideCountDefault: record.slide_count_default as number,
+          canvasWidth: (record.canvas_width as number) || 1080,
+          canvasHeight: (record.canvas_height as number) || 1350,
+          platformTags:
+            typeof record.platform_tags === 'string'
+              ? record.platform_tags.split(',').filter(Boolean)
+              : [],
+          slideCountDefault: (record.slide_count_default as number) || 5,
         }
         setTemplate(t)
         setSchema(t.schemaJson)

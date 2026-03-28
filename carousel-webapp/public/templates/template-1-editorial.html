@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE 1 — EDITORIAL / CREAM  ·  8-slide carousel
+  Palette: cream bg · dark text · orange accent
+  Fonts:   Barlow Condensed (headlines) · DM Sans (body/UI) · Lora italic (quotes/taglines)
+
+  HOW TO EDIT:
+  1. Change design tokens in :root for whole-carousel retheme.
+  2. Search <!-- EDIT --> — every content placeholder is marked.
+  3. Each slide header comment lists exactly what to change.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template 1 — Editorial · 8 Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+
+/* ── DESIGN TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg:     #F0EDE5;   /* EDIT: slide background */
+  --text:   #111110;   /* EDIT: primary text color */
+  --accent: #E05828;   /* EDIT: orange — oval, stat units, accented words */
+  --muted:  rgba(17,17,16,0.50);
+
+  /* EDIT: font sizes */
+  --sz-cover:    196px;
+  --sz-stat:     280px;
+  --sz-headline: 130px;
+  --sz-quote:     64px;
+  --sz-list-num:  72px;
+  --sz-stat-val: 140px;
+  --sz-body:      36px;
+  --sz-tag:       22px;
+  --sz-eyebrow:   22px;
+  --sz-brand:     20px;
+  --sz-tagline:   31px;
+  --sz-lbl:       50px;
+  --sz-caption:   34px;
+}
+
+/* ── RESET ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── SHELL ──────────────────────────────────────────────────────── */
+body {
+  background: #161616;
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 48px 24px; gap: 28px;
+  font-family: 'DM Sans', sans-serif;
+}
+.page-label {
+  color: rgba(255,255,255,0.28);
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+}
+
+/* ── VIEWER ─────────────────────────────────────────────────────── */
+.viewer {
+  position: relative;
+  width: 540px; height: 675px;
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 48px 96px rgba(0,0,0,0.72), 0 0 0 1px rgba(255,255,255,0.06);
+  cursor: default;
+}
+
+/* ── SLIDE (full-res 1080×1350, scaled to 50%) ──────────────────── */
+.slide {
+  position: absolute; inset: 0;
+  width: 1080px; height: 1350px;
+  transform: scale(0.5); transform-origin: top left;
+  background: var(--bg); color: var(--text);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* ── SLIDE INNER ────────────────────────────────────────────────── */
+.si {
+  width: 100%; height: 100%;
+  padding: 72px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ── STRUCTURAL ROWS ────────────────────────────────────────────── */
+.top    { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+
+/* ── PILL TAG ───────────────────────────────────────────────────── */
+.tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 2px solid currentColor; border-radius: 100px;
+  padding: 11px 26px;
+  font-size: var(--sz-tag); font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  white-space: nowrap; line-height: 1; color: var(--text);
+}
+.tag svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* ── CIRCLE BUTTON ──────────────────────────────────────────────── */
+.circle-btn {
+  width: 84px; height: 84px; border-radius: 50%;
+  border: 2.5px solid currentColor;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.circle-btn svg { width: 34px; height: 34px; }
+
+/* ── LABELS ─────────────────────────────────────────────────────── */
+.eyebrow {
+  font-size: var(--sz-eyebrow); font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+.brand {
+  font-size: var(--sz-brand); font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+.star { font-size: 48px; line-height: 1; color: var(--accent); }
+.source {
+  font-size: 22px; font-weight: 300;
+  letter-spacing: 0.02em; color: var(--muted);
+  display: block; margin-top: 32px;
+}
+
+/* ── TAGLINE ────────────────────────────────────────────────────── */
+.tagline {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: var(--sz-tagline); line-height: 1.52;
+  max-width: 380px; text-align: right; color: var(--muted);
+}
+
+/* ── COVER HEADLINE ─────────────────────────────────────────────── */
+.headline-cover {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-cover); font-weight: 900;
+  line-height: 0.88; text-transform: uppercase;
+  letter-spacing: -0.015em; margin-top: 40px;
+}
+.circled { position: relative; display: inline-block; }
+.circled svg.oval {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 116%; height: 138%; pointer-events: none;
+}
+
+/* ── INNER HEADLINE ─────────────────────────────────────────────── */
+.headline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-headline); font-weight: 900;
+  line-height: 0.9; text-transform: uppercase;
+  letter-spacing: -0.015em;
+}
+.headline .ac { color: var(--accent); }
+
+/* ── STAT NUMBER ────────────────────────────────────────────────── */
+.big-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-stat); font-weight: 900;
+  line-height: 0.83; letter-spacing: -0.025em;
+}
+.big-num .unit { color: var(--accent); }
+.data-row { display: flex; align-items: center; gap: 24px; margin-top: 20px; }
+.data-lbl {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: var(--sz-lbl);
+}
+
+/* ── BODY / CAPTION ─────────────────────────────────────────────── */
+.caption {
+  font-size: var(--sz-caption); font-weight: 300;
+  line-height: 1.52; max-width: 840px;
+}
+.caption strong { color: var(--accent); font-weight: 600; }
+.body-text {
+  font-size: var(--sz-body); font-weight: 300;
+  line-height: 1.58; max-width: 840px;
+}
+.body-text strong { font-weight: 600; }
+
+/* ── PULL QUOTE ─────────────────────────────────────────────────── */
+.quote-block {
+  flex: 1; display: flex; flex-direction: column;
+  justify-content: center; gap: 40px;
+}
+.quote-text {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: var(--sz-quote); font-weight: 400;
+  line-height: 1.38; max-width: 920px;
+}
+.attribution {
+  font-size: 26px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+}
+
+/* ── NUMBERED LIST ──────────────────────────────────────────────── */
+.numbered-list { display: flex; flex-direction: column; gap: 44px; margin-top: 16px; }
+.list-item { display: flex; align-items: flex-start; gap: 36px; }
+.item-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-list-num); font-weight: 900;
+  line-height: 1; color: var(--accent);
+  flex-shrink: 0; width: 90px; padding-top: 4px;
+}
+.item-text { font-size: 38px; font-weight: 300; line-height: 1.48; }
+.item-text strong { font-weight: 600; }
+
+/* ── TWO-STAT GRID ──────────────────────────────────────────────── */
+.stat-grid { display: flex; gap: 48px; margin-top: 12px; }
+.stat-box {
+  flex: 1; border-top: 2px solid rgba(17,17,16,0.18);
+  padding-top: 32px; display: flex; flex-direction: column; gap: 8px;
+}
+.stat-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-stat-val); font-weight: 900;
+  line-height: 0.88; letter-spacing: -0.015em;
+}
+.stat-val .unit { color: var(--accent); }
+.stat-label {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: 40px; color: var(--muted);
+}
+
+/* ── TAKEAWAY STATEMENT ─────────────────────────────────────────── */
+.statement {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: 68px; font-weight: 400;
+  line-height: 1.3; max-width: 900px;
+  flex: 1; display: flex; align-items: center;
+}
+
+/* ── CONTROLS ───────────────────────────────────────────────────── */
+.controls { display: flex; align-items: center; gap: 20px; }
+.nav-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s, border-color 0.18s, transform 0.12s;
+}
+.nav-btn:hover  { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.35); }
+.nav-btn:active { transform: scale(0.93); }
+.nav-btn svg { width: 17px; height: 17px; }
+.dots { display: flex; gap: 7px; }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.18); border: none; cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.dot.active { background: var(--accent); transform: scale(1.4); }
+.counter {
+  color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 500;
+  min-width: 44px; text-align: center; letter-spacing: 0.05em;
+}
+
+</style>
+</head>
+<body>
+
+<p class="page-label">Template 1 — Editorial / Cream &nbsp;·&nbsp; 8 Slides</p>
+
+<div class="viewer" id="viewer">
+
+  <!-- ══ SLIDE 1 · COVER ══════════════════════════════════════════
+       EDIT: left tag, right tag, headline lines (4 divs),
+             which word gets .circled + oval, tagline (2 lines)      -->
+  <div class="slide active" id="s1">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: left pill tag text -->
+        <span class="tag" data-slot="s1_tag_left">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          CATEGORY
+        </span>
+        <!-- EDIT: right pill tag text -->
+        <span class="tag" data-slot="s1_tag_right">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          LABEL
+        </span>
+      </div>
+
+      <!-- EDIT: 4 headline lines. Move .circled to the word you want circled. -->
+      <div class="headline-cover">
+        <div data-slot="s1_headline_line1">LINE ONE</div>
+        <div data-slot="s1_headline_line2">LINE TWO</div>
+        <div class="circled" data-slot="s1_headline_circled">
+          CIRCLED
+          <svg class="oval" viewBox="0 0 420 140" fill="none" preserveAspectRatio="none">
+            <path d="M22,70 C12,12 108,-4 210,4 C312,12 402,22 400,70 C398,118 308,142 210,138 C112,134 32,128 22,70"
+                  stroke="var(--accent)" stroke-width="9" stroke-linecap="round" fill="none" opacity="0.92"/>
+          </svg>
+        </div>
+        <div data-slot="s1_headline_line4">LINE FOUR.</div>
+      </div>
+
+      <div class="bottom">
+        <div class="circle-btn" style="color:var(--text);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+        </div>
+        <!-- EDIT: 1–2 line italic tagline, bottom-right -->
+        <p class="tagline" data-slot="s1_tagline">Your italic tagline<br>goes here.</p>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 2 · STAT ═══════════════════════════════════════════
+       EDIT: brand label, date, big number, unit (M/B/K/%/x),
+             italic label, caption (wrap key phrase in <strong>)     -->
+  <div class="slide" id="s2">
+    <div class="si">
+
+      <div class="top">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span class="star">✳</span>
+          <!-- EDIT: section or brand name in brackets -->
+          <span class="brand" data-slot="s2_brand">BRAND / SECTION</span>
+        </div>
+        <!-- EDIT: date or context label -->
+        <span class="brand" data-slot="s2_date">DATE</span>
+      </div>
+
+      <div>
+        <!-- EDIT: big number + unit letter -->
+        <div class="big-num" data-slot="s2_stat_num">42<span class="unit">M</span></div>
+        <div class="data-row">
+          <div class="circle-btn" style="color:var(--accent);border-color:var(--accent);">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+          </div>
+          <!-- EDIT: italic serif label next to arrow -->
+          <span class="data-lbl" data-slot="s2_stat_label">Italic label here.</span>
+        </div>
+      </div>
+
+      <!-- EDIT: 2–3 sentence caption. Wrap key phrase in <strong>. -->
+      <p class="caption" data-slot="s2_caption">
+        First supporting sentence, short and punchy.<br>
+        Second sentence adds <strong>key phrase</strong> context.
+      </p>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 3 · INSIGHT ════════════════════════════════════════
+       EDIT: eyebrow label, headline (2 lines), body text, source   -->
+  <div class="slide" id="s3">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: eyebrow category label -->
+        <span class="eyebrow" data-slot="s3_eyebrow">EYEBROW LABEL</span>
+        <div class="circle-btn" style="color:var(--muted);border-color:rgba(17,17,16,0.2);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+        </div>
+      </div>
+
+      <!-- EDIT: 2-line headline. Add class="ac" to any word div for orange. -->
+      <div class="headline">
+        <div data-slot="s3_headline_line1">HEADLINE</div>
+        <div data-slot="s3_headline_line2">LINE TWO</div>
+      </div>
+
+      <div>
+        <!-- EDIT: 3–4 sentence body paragraph -->
+        <p class="body-text" data-slot="s3_body">
+          First sentence sets up the insight clearly and confidently.
+          Second sentence expands with detail or evidence.
+          Third sentence lands the punch — make it memorable.
+        </p>
+        <!-- EDIT: delete this span if no source needed -->
+        <span class="source" data-slot="s3_source">Source: Publication, Date</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 4 · PULL QUOTE ═════════════════════════════════════
+       EDIT: context tag, quote text (keep ≤ 20 words), attribution -->
+  <div class="slide" id="s4">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: context tag or eyebrow -->
+        <span class="tag" data-slot="s4_context_tag">CONTEXT</span>
+        <span class="brand" data-slot="s4_date">DATE</span>
+      </div>
+
+      <div class="quote-block">
+        <!-- EDIT: large italic pull quote -->
+        <p class="quote-text" data-slot="s4_quote">
+          "Your pull quote sits here in large italic serif,
+          making it impossible to scroll past."
+        </p>
+        <!-- EDIT: attribution — name, role, or source -->
+        <span class="attribution" data-slot="s4_attribution">— NAME / SOURCE</span>
+      </div>
+
+      <div class="bottom">
+        <span></span>
+        <div class="circle-btn" style="color:var(--text);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 5 · NUMBERED LIST ══════════════════════════════════
+       EDIT: eyebrow, headline (2 lines), 3 list items              -->
+  <div class="slide" id="s5">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: eyebrow label -->
+        <span class="eyebrow" data-slot="s5_eyebrow">EYEBROW LABEL</span>
+        <span class="brand" data-slot="s5_brand">BRAND</span>
+      </div>
+
+      <!-- EDIT: 2-line headline -->
+      <div class="headline">
+        <div data-slot="s5_headline_line1">HEADLINE</div>
+        <div data-slot="s5_headline_line2">LINE TWO</div>
+      </div>
+
+      <!-- EDIT: 3 numbered items. Wrap key word in <strong> to bold. -->
+      <div class="numbered-list">
+        <div class="list-item">
+          <span class="item-num">01</span>
+          <span class="item-text" data-slot="s5_item1">First point — short, punchy, actionable.</span>
+        </div>
+        <div class="list-item">
+          <span class="item-num">02</span>
+          <span class="item-text" data-slot="s5_item2">Second point — add a little more context here.</span>
+        </div>
+        <div class="list-item">
+          <span class="item-num">03</span>
+          <span class="item-text" data-slot="s5_item3">Third point — land the surprise or counter-intuitive take.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 6 · TWO STATS ══════════════════════════════════════
+       EDIT: eyebrow, headline, 2× (value + unit + label), caption  -->
+  <div class="slide" id="s6">
+    <div class="si">
+
+      <div class="top">
+        <span class="eyebrow" data-slot="s6_eyebrow">EYEBROW LABEL</span>
+        <span class="brand" data-slot="s6_date">DATE</span>
+      </div>
+
+      <!-- EDIT: 2-line headline -->
+      <div class="headline">
+        <div data-slot="s6_headline_line1">HEADLINE</div>
+        <div data-slot="s6_headline_line2">LINE TWO</div>
+      </div>
+
+      <!-- EDIT: two stat boxes — value, unit (M/B/K/%/x), italic label -->
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-val" data-slot="s6_stat1_val">84<span class="unit">%</span></div>
+          <span class="stat-label" data-slot="s6_stat1_label">Italic label.</span>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" data-slot="s6_stat2_val">3<span class="unit">x</span></div>
+          <span class="stat-label" data-slot="s6_stat2_label">Italic label.</span>
+        </div>
+      </div>
+
+      <!-- EDIT: 1–2 sentences connecting both stats -->
+      <p class="caption" data-slot="s6_caption">One or two sentences connecting the two stats and telling the story.</p>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 7 · TAKEAWAY ═══════════════════════════════════════
+       EDIT: top tag, large italic statement (≤ 15 words), body     -->
+  <div class="slide" id="s7">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: single tag label -->
+        <span class="tag" data-slot="s7_tag">TAKEAWAY</span>
+      </div>
+
+      <!-- EDIT: large Lora italic statement — the single memorable line -->
+      <p class="statement" data-slot="s7_statement">
+        "Your key takeaway, written as a punchy
+        memorable sentence in Lora italic."
+      </p>
+
+      <div class="bottom">
+        <!-- EDIT: 1 supporting sentence -->
+        <p class="body-text" style="max-width:700px;" data-slot="s7_body">
+          One sentence that earns the statement above.
+        </p>
+        <div class="circle-btn" style="color:var(--text);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 8 · CTA ════════════════════════════════════════════
+       EDIT: eyebrow, author name, big CTA headline, follow pitch   -->
+  <div class="slide" id="s8">
+    <div class="si">
+
+      <div class="top">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span class="star">✳</span>
+          <!-- EDIT: eyebrow — e.g. "IF YOU FOUND THIS USEFUL" -->
+          <span class="eyebrow" data-slot="s8_eyebrow">IF YOU FOUND THIS USEFUL</span>
+        </div>
+        <!-- EDIT: your name or brand -->
+        <span class="brand" data-slot="s8_author">YOUR NAME</span>
+      </div>
+
+      <!-- EDIT: 2–3 line CTA headline. Add .ac to an accent line. -->
+      <div class="headline" style="font-size:148px;">
+        <div data-slot="s8_cta_line1">FOLLOW</div>
+        <div data-slot="s8_cta_line2">FOR MORE</div>
+        <div class="ac" data-slot="s8_cta_line3">LIKE THIS.</div>
+      </div>
+
+      <div class="bottom">
+        <!-- EDIT: 1–2 sentence follow pitch -->
+        <p class="body-text" style="max-width:680px;" data-slot="s8_follow_pitch">
+          One sentence about what you post. Second sentence with a gentle ask — follow, comment, or share.
+        </p>
+        <div class="circle-btn" style="color:var(--text);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /viewer -->
+
+<div class="controls">
+  <button class="nav-btn" id="prev" aria-label="Previous">
+    <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4L6 8.5L11 13"/></svg>
+  </button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">1 / 8</span>
+  <button class="nav-btn" id="next" aria-label="Next">
+    <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4L11 8.5L6 13"/></svg>
+  </button>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const dotsEl = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  let cur = 0;
+  const N = slides.length;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+
+  function go(idx) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = ((idx % N) + N) % N;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counter.textContent = (cur + 1) + ' / ' + N;
+  }
+
+  document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+  document.getElementById('next').addEventListener('click', () => go(cur + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  go(cur - 1);
+    if (e.key === 'ArrowRight') go(cur + 1);
+  });
+
+  let tx = 0;
+  const vw = document.getElementById('viewer');
+  vw.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  vw.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) go(dx < 0 ? cur + 1 : cur - 1);
+  }, { passive: true });
+</script>
+
+</body>
+</html>

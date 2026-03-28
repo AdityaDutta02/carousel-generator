@@ -1,0 +1,249 @@
+{
+  "template-1-editorial": {
+    "version": 1,
+    "slots": [
+      {"id": "accent", "slide": "all", "selector": ":root", "type": "css_var", "variable": "--accent", "label": "Accent Color", "default": "#E05828"},
+
+      {"id": "s1_tag_left",       "slide": 1, "selector": "[data-slot='s1_tag_left']",       "type": "text", "label": "Cover Tag Left",       "maxChars": 30},
+      {"id": "s1_tag_right",      "slide": 1, "selector": "[data-slot='s1_tag_right']",      "type": "text", "label": "Cover Tag Right",      "maxChars": 30},
+      {"id": "s1_headline_line1", "slide": 1, "selector": "[data-slot='s1_headline_line1']", "type": "text", "label": "Headline Line 1",       "maxChars": 20},
+      {"id": "s1_headline_line2", "slide": 1, "selector": "[data-slot='s1_headline_line2']", "type": "text", "label": "Headline Line 2",       "maxChars": 20},
+      {"id": "s1_headline_circled","slide": 1,"selector": "[data-slot='s1_headline_circled']","type": "text", "label": "Circled Word",          "maxChars": 20},
+      {"id": "s1_headline_line4", "slide": 1, "selector": "[data-slot='s1_headline_line4']", "type": "text", "label": "Headline Line 4",       "maxChars": 20},
+      {"id": "s1_tagline",        "slide": 1, "selector": "[data-slot='s1_tagline']",        "type": "text", "label": "Cover Tagline",         "maxChars": 80},
+
+      {"id": "s2_brand",          "slide": 2, "selector": "[data-slot='s2_brand']",          "type": "text", "label": "Brand / Section",       "maxChars": 40},
+      {"id": "s2_date",           "slide": 2, "selector": "[data-slot='s2_date']",           "type": "text", "label": "Date / Context",        "maxChars": 30},
+      {"id": "s2_stat_num",       "slide": 2, "selector": "[data-slot='s2_stat_num']",       "type": "text", "label": "Stat Number + Unit",    "maxChars": 10},
+      {"id": "s2_stat_label",     "slide": 2, "selector": "[data-slot='s2_stat_label']",     "type": "text", "label": "Stat Italic Label",     "maxChars": 60},
+      {"id": "s2_caption",        "slide": 2, "selector": "[data-slot='s2_caption']",        "type": "text", "label": "Stat Caption",          "maxChars": 200},
+
+      {"id": "s3_eyebrow",        "slide": 3, "selector": "[data-slot='s3_eyebrow']",        "type": "text", "label": "Eyebrow Label",         "maxChars": 40},
+      {"id": "s3_headline_line1", "slide": 3, "selector": "[data-slot='s3_headline_line1']", "type": "text", "label": "Headline Line 1",       "maxChars": 20},
+      {"id": "s3_headline_line2", "slide": 3, "selector": "[data-slot='s3_headline_line2']", "type": "text", "label": "Headline Line 2",       "maxChars": 20},
+      {"id": "s3_body",           "slide": 3, "selector": "[data-slot='s3_body']",           "type": "text", "label": "Body Paragraph",        "maxChars": 400},
+      {"id": "s3_source",         "slide": 3, "selector": "[data-slot='s3_source']",         "type": "text", "label": "Source Attribution",    "maxChars": 80},
+
+      {"id": "s4_context_tag",    "slide": 4, "selector": "[data-slot='s4_context_tag']",    "type": "text", "label": "Context Tag",           "maxChars": 30},
+      {"id": "s4_date",           "slide": 4, "selector": "[data-slot='s4_date']",           "type": "text", "label": "Date",                  "maxChars": 30},
+      {"id": "s4_quote",          "slide": 4, "selector": "[data-slot='s4_quote']",          "type": "text", "label": "Pull Quote",            "maxChars": 160},
+      {"id": "s4_attribution",    "slide": 4, "selector": "[data-slot='s4_attribution']",    "type": "text", "label": "Quote Attribution",     "maxChars": 60},
+
+      {"id": "s5_eyebrow",        "slide": 5, "selector": "[data-slot='s5_eyebrow']",        "type": "text", "label": "Eyebrow Label",         "maxChars": 40},
+      {"id": "s5_brand",          "slide": 5, "selector": "[data-slot='s5_brand']",          "type": "text", "label": "Brand",                 "maxChars": 30},
+      {"id": "s5_headline_line1", "slide": 5, "selector": "[data-slot='s5_headline_line1']", "type": "text", "label": "Headline Line 1",       "maxChars": 20},
+      {"id": "s5_headline_line2", "slide": 5, "selector": "[data-slot='s5_headline_line2']", "type": "text", "label": "Headline Line 2",       "maxChars": 20},
+      {"id": "s5_item1",          "slide": 5, "selector": "[data-slot='s5_item1']",          "type": "text", "label": "List Item 1",           "maxChars": 120},
+      {"id": "s5_item2",          "slide": 5, "selector": "[data-slot='s5_item2']",          "type": "text", "label": "List Item 2",           "maxChars": 120},
+      {"id": "s5_item3",          "slide": 5, "selector": "[data-slot='s5_item3']",          "type": "text", "label": "List Item 3",           "maxChars": 120},
+
+      {"id": "s6_eyebrow",        "slide": 6, "selector": "[data-slot='s6_eyebrow']",        "type": "text", "label": "Eyebrow Label",         "maxChars": 40},
+      {"id": "s6_date",           "slide": 6, "selector": "[data-slot='s6_date']",           "type": "text", "label": "Date",                  "maxChars": 30},
+      {"id": "s6_headline_line1", "slide": 6, "selector": "[data-slot='s6_headline_line1']", "type": "text", "label": "Headline Line 1",       "maxChars": 20},
+      {"id": "s6_headline_line2", "slide": 6, "selector": "[data-slot='s6_headline_line2']", "type": "text", "label": "Headline Line 2",       "maxChars": 20},
+      {"id": "s6_stat1_val",      "slide": 6, "selector": "[data-slot='s6_stat1_val']",      "type": "text", "label": "Stat 1 Value + Unit",   "maxChars": 10},
+      {"id": "s6_stat1_label",    "slide": 6, "selector": "[data-slot='s6_stat1_label']",    "type": "text", "label": "Stat 1 Label",          "maxChars": 60},
+      {"id": "s6_stat2_val",      "slide": 6, "selector": "[data-slot='s6_stat2_val']",      "type": "text", "label": "Stat 2 Value + Unit",   "maxChars": 10},
+      {"id": "s6_stat2_label",    "slide": 6, "selector": "[data-slot='s6_stat2_label']",    "type": "text", "label": "Stat 2 Label",          "maxChars": 60},
+      {"id": "s6_caption",        "slide": 6, "selector": "[data-slot='s6_caption']",        "type": "text", "label": "Two-Stat Caption",      "maxChars": 200},
+
+      {"id": "s7_tag",            "slide": 7, "selector": "[data-slot='s7_tag']",            "type": "text", "label": "Takeaway Tag",          "maxChars": 30},
+      {"id": "s7_statement",      "slide": 7, "selector": "[data-slot='s7_statement']",      "type": "text", "label": "Takeaway Statement",    "maxChars": 160},
+      {"id": "s7_body",           "slide": 7, "selector": "[data-slot='s7_body']",           "type": "text", "label": "Supporting Sentence",   "maxChars": 120},
+
+      {"id": "s8_eyebrow",        "slide": 8, "selector": "[data-slot='s8_eyebrow']",        "type": "text", "label": "CTA Eyebrow",           "maxChars": 50},
+      {"id": "s8_author",         "slide": 8, "selector": "[data-slot='s8_author']",         "type": "text", "label": "Author / Brand",        "maxChars": 40},
+      {"id": "s8_cta_line1",      "slide": 8, "selector": "[data-slot='s8_cta_line1']",      "type": "text", "label": "CTA Headline Line 1",   "maxChars": 20},
+      {"id": "s8_cta_line2",      "slide": 8, "selector": "[data-slot='s8_cta_line2']",      "type": "text", "label": "CTA Headline Line 2",   "maxChars": 20},
+      {"id": "s8_cta_line3",      "slide": 8, "selector": "[data-slot='s8_cta_line3']",      "type": "text", "label": "CTA Headline Line 3 (Accent)", "maxChars": 20},
+      {"id": "s8_follow_pitch",   "slide": 8, "selector": "[data-slot='s8_follow_pitch']",   "type": "text", "label": "Follow Pitch",          "maxChars": 160}
+    ]
+  },
+
+  "template-2-data": {
+    "version": 1,
+    "slots": [
+      {"id": "accent", "slide": "all", "selector": ":root", "type": "css_var", "variable": "--accent", "label": "Accent Color", "default": "#E05828"},
+
+      {"id": "s1_tag_left",          "slide": 1, "selector": "[data-slot='s1_tag_left']",          "type": "text", "label": "Cover Tag Left",         "maxChars": 30},
+      {"id": "s1_tag_right",         "slide": 1, "selector": "[data-slot='s1_tag_right']",         "type": "text", "label": "Cover Tag Right",        "maxChars": 30},
+      {"id": "s1_headline_line1",    "slide": 1, "selector": "[data-slot='s1_headline_line1']",    "type": "text", "label": "Headline Line 1",         "maxChars": 20},
+      {"id": "s1_headline_line2",    "slide": 1, "selector": "[data-slot='s1_headline_line2']",    "type": "text", "label": "Headline Line 2",         "maxChars": 20},
+      {"id": "s1_headline_accent",   "slide": 1, "selector": "[data-slot='s1_headline_accent']",   "type": "text", "label": "Headline Accent Line",    "maxChars": 20},
+      {"id": "s1_headline_line4",    "slide": 1, "selector": "[data-slot='s1_headline_line4']",    "type": "text", "label": "Headline Line 4",         "maxChars": 20},
+      {"id": "s1_tagline",           "slide": 1, "selector": "[data-slot='s1_tagline']",           "type": "text", "label": "Cover Tagline",           "maxChars": 80},
+
+      {"id": "s2_brand",             "slide": 2, "selector": "[data-slot='s2_brand']",             "type": "text", "label": "Section Name",            "maxChars": 40},
+      {"id": "s2_date",              "slide": 2, "selector": "[data-slot='s2_date']",              "type": "text", "label": "Date / Context",          "maxChars": 30},
+      {"id": "s2_stat_num",          "slide": 2, "selector": "[data-slot='s2_stat_num']",          "type": "text", "label": "Stat 1 Number + Unit",    "maxChars": 10},
+      {"id": "s2_stat_label",        "slide": 2, "selector": "[data-slot='s2_stat_label']",        "type": "text", "label": "Stat 1 Italic Label",     "maxChars": 60},
+      {"id": "s2_caption",           "slide": 2, "selector": "[data-slot='s2_caption']",           "type": "text", "label": "Stat 1 Caption",          "maxChars": 200},
+
+      {"id": "s3_brand",             "slide": 3, "selector": "[data-slot='s3_brand']",             "type": "text", "label": "Section Name",            "maxChars": 40},
+      {"id": "s3_date",              "slide": 3, "selector": "[data-slot='s3_date']",              "type": "text", "label": "Date",                    "maxChars": 30},
+      {"id": "s3_stat_num",          "slide": 3, "selector": "[data-slot='s3_stat_num']",          "type": "text", "label": "Stat 2 Number + Unit",    "maxChars": 10},
+      {"id": "s3_stat_label",        "slide": 3, "selector": "[data-slot='s3_stat_label']",        "type": "text", "label": "Stat 2 Italic Label",     "maxChars": 60},
+      {"id": "s3_caption",           "slide": 3, "selector": "[data-slot='s3_caption']",           "type": "text", "label": "Stat 2 Caption",          "maxChars": 200},
+      {"id": "s3_source",            "slide": 3, "selector": "[data-slot='s3_source']",            "type": "text", "label": "Source Attribution",      "maxChars": 80},
+
+      {"id": "s4_eyebrow",           "slide": 4, "selector": "[data-slot='s4_eyebrow']",           "type": "text", "label": "Eyebrow Label",           "maxChars": 40},
+      {"id": "s4_date",              "slide": 4, "selector": "[data-slot='s4_date']",              "type": "text", "label": "Date",                    "maxChars": 30},
+      {"id": "s4_headline_line1",    "slide": 4, "selector": "[data-slot='s4_headline_line1']",    "type": "text", "label": "Headline Line 1",         "maxChars": 20},
+      {"id": "s4_headline_accent",   "slide": 4, "selector": "[data-slot='s4_headline_accent']",   "type": "text", "label": "Headline Accent Line",    "maxChars": 20},
+      {"id": "s4_headline_line3",    "slide": 4, "selector": "[data-slot='s4_headline_line3']",    "type": "text", "label": "Headline Line 3",         "maxChars": 20},
+      {"id": "s4_body",              "slide": 4, "selector": "[data-slot='s4_body']",              "type": "text", "label": "Body Paragraph",          "maxChars": 400},
+      {"id": "s4_source",            "slide": 4, "selector": "[data-slot='s4_source']",            "type": "text", "label": "Source Attribution",      "maxChars": 80},
+
+      {"id": "s5_context",           "slide": 5, "selector": "[data-slot='s5_context']",           "type": "text", "label": "Context / Section",       "maxChars": 40},
+      {"id": "s5_date",              "slide": 5, "selector": "[data-slot='s5_date']",              "type": "text", "label": "Date",                    "maxChars": 30},
+      {"id": "s5_quote",             "slide": 5, "selector": "[data-slot='s5_quote']",             "type": "text", "label": "Pull Quote",              "maxChars": 160},
+      {"id": "s5_attribution",       "slide": 5, "selector": "[data-slot='s5_attribution']",       "type": "text", "label": "Quote Attribution",       "maxChars": 60},
+
+      {"id": "s6_eyebrow",           "slide": 6, "selector": "[data-slot='s6_eyebrow']",           "type": "text", "label": "Eyebrow Label",           "maxChars": 40},
+      {"id": "s6_date",              "slide": 6, "selector": "[data-slot='s6_date']",              "type": "text", "label": "Date",                    "maxChars": 30},
+      {"id": "s6_headline_line1",    "slide": 6, "selector": "[data-slot='s6_headline_line1']",    "type": "text", "label": "Headline Line 1",         "maxChars": 20},
+      {"id": "s6_headline_line2",    "slide": 6, "selector": "[data-slot='s6_headline_line2']",    "type": "text", "label": "Headline Line 2",         "maxChars": 20},
+      {"id": "s6_point1",            "slide": 6, "selector": "[data-slot='s6_point1']",            "type": "text", "label": "Point 1",                 "maxChars": 120},
+      {"id": "s6_point2",            "slide": 6, "selector": "[data-slot='s6_point2']",            "type": "text", "label": "Point 2",                 "maxChars": 120},
+      {"id": "s6_point3",            "slide": 6, "selector": "[data-slot='s6_point3']",            "type": "text", "label": "Point 3",                 "maxChars": 120},
+
+      {"id": "s7_take_label",        "slide": 7, "selector": "[data-slot='s7_take_label']",        "type": "text", "label": "Take Label",              "maxChars": 30},
+      {"id": "s7_author",            "slide": 7, "selector": "[data-slot='s7_author']",            "type": "text", "label": "Author Name",             "maxChars": 40},
+      {"id": "s7_headline_line1",    "slide": 7, "selector": "[data-slot='s7_headline_line1']",    "type": "text", "label": "Opinion Headline Line 1", "maxChars": 20},
+      {"id": "s7_headline_accent",   "slide": 7, "selector": "[data-slot='s7_headline_accent']",   "type": "text", "label": "Opinion Accent Line",     "maxChars": 20},
+      {"id": "s7_headline_line3",    "slide": 7, "selector": "[data-slot='s7_headline_line3']",    "type": "text", "label": "Opinion Headline Line 3", "maxChars": 20},
+      {"id": "s7_opinion",           "slide": 7, "selector": "[data-slot='s7_opinion']",           "type": "text", "label": "Opinion Paragraph",       "maxChars": 300},
+
+      {"id": "s8_section",           "slide": 8, "selector": "[data-slot='s8_section']",           "type": "text", "label": "Section Context",         "maxChars": 30},
+      {"id": "s8_author",            "slide": 8, "selector": "[data-slot='s8_author']",            "type": "text", "label": "Author / Brand",          "maxChars": 40},
+      {"id": "s8_cta_line1",         "slide": 8, "selector": "[data-slot='s8_cta_line1']",         "type": "text", "label": "CTA Headline Line 1",     "maxChars": 20},
+      {"id": "s8_cta_line2",         "slide": 8, "selector": "[data-slot='s8_cta_line2']",         "type": "text", "label": "CTA Headline Line 2",     "maxChars": 20},
+      {"id": "s8_cta_line3",         "slide": 8, "selector": "[data-slot='s8_cta_line3']",         "type": "text", "label": "CTA Headline Line 3 (Accent)", "maxChars": 20},
+      {"id": "s8_cta_body",          "slide": 8, "selector": "[data-slot='s8_cta_body']",          "type": "text", "label": "CTA Body Text",           "maxChars": 160}
+    ]
+  },
+
+  "template-3-card": {
+    "version": 1,
+    "slots": [
+      {"id": "bg", "slide": "all", "selector": ":root", "type": "css_var", "variable": "--bg", "label": "Background Color", "default": "#E05828"},
+
+      {"id": "s1_tag",       "slide": 1, "selector": "[data-slot='s1_tag']",       "type": "text", "label": "Cover Tag",           "maxChars": 30},
+      {"id": "s1_eyebrow",   "slide": 1, "selector": "[data-slot='s1_eyebrow']",   "type": "text", "label": "Cover Eyebrow",       "maxChars": 40},
+      {"id": "s1_headline",  "slide": 1, "selector": "[data-slot='s1_headline']",  "type": "text", "label": "Cover Headline",      "maxChars": 80},
+      {"id": "s1_cta_pill",  "slide": 1, "selector": "[data-slot='s1_cta_pill']",  "type": "text", "label": "CTA Pill Text",       "maxChars": 40},
+      {"id": "s1_brand",     "slide": 1, "selector": "[data-slot='s1_brand']",     "type": "text", "label": "Brand Name",          "maxChars": 40},
+
+      {"id": "s2_tag",       "slide": 2, "selector": "[data-slot='s2_tag']",       "type": "text", "label": "Context Tag",         "maxChars": 30},
+      {"id": "s2_eyebrow",   "slide": 2, "selector": "[data-slot='s2_eyebrow']",   "type": "text", "label": "Reason #1 Label",     "maxChars": 40},
+      {"id": "s2_headline",  "slide": 2, "selector": "[data-slot='s2_headline']",  "type": "text", "label": "Point 1 Headline",    "maxChars": 80},
+      {"id": "s2_body",      "slide": 2, "selector": "[data-slot='s2_body']",      "type": "text", "label": "Point 1 Body",        "maxChars": 300},
+      {"id": "s2_cta_label", "slide": 2, "selector": "[data-slot='s2_cta_label']", "type": "text", "label": "CTA Row Label",       "maxChars": 30},
+      {"id": "s2_brand",     "slide": 2, "selector": "[data-slot='s2_brand']",     "type": "text", "label": "Brand",               "maxChars": 30},
+
+      {"id": "s3_tag",       "slide": 3, "selector": "[data-slot='s3_tag']",       "type": "text", "label": "Context Tag",         "maxChars": 30},
+      {"id": "s3_eyebrow",   "slide": 3, "selector": "[data-slot='s3_eyebrow']",   "type": "text", "label": "Reason #2 Label",     "maxChars": 40},
+      {"id": "s3_headline",  "slide": 3, "selector": "[data-slot='s3_headline']",  "type": "text", "label": "Point 2 Headline",    "maxChars": 80},
+      {"id": "s3_body",      "slide": 3, "selector": "[data-slot='s3_body']",      "type": "text", "label": "Point 2 Body",        "maxChars": 300},
+      {"id": "s3_cta_label", "slide": 3, "selector": "[data-slot='s3_cta_label']", "type": "text", "label": "CTA Row Label",       "maxChars": 30},
+      {"id": "s3_brand",     "slide": 3, "selector": "[data-slot='s3_brand']",     "type": "text", "label": "Brand",               "maxChars": 30},
+
+      {"id": "s4_tag",       "slide": 4, "selector": "[data-slot='s4_tag']",       "type": "text", "label": "Context Tag",         "maxChars": 30},
+      {"id": "s4_eyebrow",   "slide": 4, "selector": "[data-slot='s4_eyebrow']",   "type": "text", "label": "Reason #3 Label",     "maxChars": 40},
+      {"id": "s4_headline",  "slide": 4, "selector": "[data-slot='s4_headline']",  "type": "text", "label": "Point 3 Headline",    "maxChars": 80},
+      {"id": "s4_body",      "slide": 4, "selector": "[data-slot='s4_body']",      "type": "text", "label": "Point 3 Body",        "maxChars": 300},
+      {"id": "s4_cta_label", "slide": 4, "selector": "[data-slot='s4_cta_label']", "type": "text", "label": "CTA Row Label",       "maxChars": 30},
+      {"id": "s4_brand",     "slide": 4, "selector": "[data-slot='s4_brand']",     "type": "text", "label": "Brand",               "maxChars": 30},
+
+      {"id": "s5_tag",       "slide": 5, "selector": "[data-slot='s5_tag']",       "type": "text", "label": "Context Tag",         "maxChars": 30},
+      {"id": "s5_eyebrow",   "slide": 5, "selector": "[data-slot='s5_eyebrow']",   "type": "text", "label": "Data Eyebrow",        "maxChars": 40},
+      {"id": "s5_stat_num",  "slide": 5, "selector": "[data-slot='s5_stat_num']",  "type": "text", "label": "Stat Number + Unit",  "maxChars": 10},
+      {"id": "s5_body",      "slide": 5, "selector": "[data-slot='s5_body']",      "type": "text", "label": "Stat Body",           "maxChars": 300},
+      {"id": "s5_brand",     "slide": 5, "selector": "[data-slot='s5_brand']",     "type": "text", "label": "Brand",               "maxChars": 30},
+
+      {"id": "s6_tag",         "slide": 6, "selector": "[data-slot='s6_tag']",         "type": "text", "label": "Context Tag",       "maxChars": 30},
+      {"id": "s6_eyebrow",     "slide": 6, "selector": "[data-slot='s6_eyebrow']",     "type": "text", "label": "Quote Eyebrow",     "maxChars": 40},
+      {"id": "s6_quote",       "slide": 6, "selector": "[data-slot='s6_quote']",       "type": "text", "label": "Pull Quote",        "maxChars": 160},
+      {"id": "s6_attribution", "slide": 6, "selector": "[data-slot='s6_attribution']", "type": "text", "label": "Attribution",       "maxChars": 60},
+      {"id": "s6_brand",       "slide": 6, "selector": "[data-slot='s6_brand']",       "type": "text", "label": "Brand",             "maxChars": 30},
+
+      {"id": "s7_tag",       "slide": 7, "selector": "[data-slot='s7_tag']",       "type": "text", "label": "Takeaway Tag",        "maxChars": 30},
+      {"id": "s7_eyebrow",   "slide": 7, "selector": "[data-slot='s7_eyebrow']",   "type": "text", "label": "Lesson Eyebrow",      "maxChars": 40},
+      {"id": "s7_statement", "slide": 7, "selector": "[data-slot='s7_statement']", "type": "text", "label": "Takeaway Statement",  "maxChars": 160},
+      {"id": "s7_body",      "slide": 7, "selector": "[data-slot='s7_body']",      "type": "text", "label": "Supporting Body",     "maxChars": 200},
+      {"id": "s7_cta_pill",  "slide": 7, "selector": "[data-slot='s7_cta_pill']",  "type": "text", "label": "CTA Pill Text",       "maxChars": 40},
+      {"id": "s7_brand",     "slide": 7, "selector": "[data-slot='s7_brand']",     "type": "text", "label": "Brand",               "maxChars": 30},
+
+      {"id": "s8_eyebrow",  "slide": 8, "selector": "[data-slot='s8_eyebrow']",  "type": "text", "label": "CTA Eyebrow",          "maxChars": 50},
+      {"id": "s8_headline", "slide": 8, "selector": "[data-slot='s8_headline']", "type": "text", "label": "CTA Headline",         "maxChars": 60},
+      {"id": "s8_body",     "slide": 8, "selector": "[data-slot='s8_body']",     "type": "text", "label": "Follow Pitch",         "maxChars": 200},
+      {"id": "s8_cta_pill", "slide": 8, "selector": "[data-slot='s8_cta_pill']", "type": "text", "label": "CTA Pill Text",        "maxChars": 40},
+      {"id": "s8_brand",    "slide": 8, "selector": "[data-slot='s8_brand']",    "type": "text", "label": "Author / Brand",       "maxChars": 40}
+    ]
+  },
+
+  "template-4-notebook": {
+    "version": 1,
+    "slots": [
+      {"id": "bg", "slide": "all", "selector": ":root", "type": "css_var", "variable": "--bg", "label": "Background Color", "default": "#C4EA58"},
+
+      {"id": "s1_brand",    "slide": 1, "selector": "[data-slot='s1_brand']",    "type": "text", "label": "Handwritten Brand",      "maxChars": 40},
+      {"id": "s1_title",    "slide": 1, "selector": "[data-slot='s1_title']",    "type": "text", "label": "Main Title",             "maxChars": 120},
+      {"id": "s1_date",     "slide": 1, "selector": "[data-slot='s1_date']",     "type": "text", "label": "Date / Subtext",         "maxChars": 60},
+      {"id": "s1_close",    "slide": 1, "selector": "[data-slot='s1_close']",    "type": "text", "label": "Closing Line",           "maxChars": 40},
+      {"id": "s1_bg_brand", "slide": 1, "selector": "[data-slot='s1_bg_brand']", "type": "text", "label": "BG Brand Label",         "maxChars": 30},
+
+      {"id": "s2_brand",    "slide": 2, "selector": "[data-slot='s2_brand']",    "type": "text", "label": "Handwritten Brand",      "maxChars": 40},
+      {"id": "s2_eyebrow",  "slide": 2, "selector": "[data-slot='s2_eyebrow']",  "type": "text", "label": "Section Eyebrow",        "maxChars": 60},
+      {"id": "s2_title",    "slide": 2, "selector": "[data-slot='s2_title']",    "type": "text", "label": "Point 1 Title",          "maxChars": 100},
+      {"id": "s2_body",     "slide": 2, "selector": "[data-slot='s2_body']",     "type": "text", "label": "Point 1 Body",           "maxChars": 400},
+      {"id": "s2_note",     "slide": 2, "selector": "[data-slot='s2_note']",     "type": "text", "label": "Handwritten Note",       "maxChars": 60},
+      {"id": "s2_bg_brand", "slide": 2, "selector": "[data-slot='s2_bg_brand']", "type": "text", "label": "BG Brand Label",         "maxChars": 30},
+
+      {"id": "s3_brand",    "slide": 3, "selector": "[data-slot='s3_brand']",    "type": "text", "label": "Handwritten Brand",      "maxChars": 40},
+      {"id": "s3_eyebrow",  "slide": 3, "selector": "[data-slot='s3_eyebrow']",  "type": "text", "label": "Section Eyebrow",        "maxChars": 60},
+      {"id": "s3_title",    "slide": 3, "selector": "[data-slot='s3_title']",    "type": "text", "label": "List Section Title",     "maxChars": 80},
+      {"id": "s3_item1",    "slide": 3, "selector": "[data-slot='s3_item1']",    "type": "text", "label": "List Item 1",            "maxChars": 120},
+      {"id": "s3_item2",    "slide": 3, "selector": "[data-slot='s3_item2']",    "type": "text", "label": "List Item 2",            "maxChars": 120},
+      {"id": "s3_item3",    "slide": 3, "selector": "[data-slot='s3_item3']",    "type": "text", "label": "List Item 3",            "maxChars": 120},
+      {"id": "s3_note",     "slide": 3, "selector": "[data-slot='s3_note']",     "type": "text", "label": "Handwritten Note",       "maxChars": 60},
+      {"id": "s3_bg_brand", "slide": 3, "selector": "[data-slot='s3_bg_brand']", "type": "text", "label": "BG Brand Label",         "maxChars": 30},
+
+      {"id": "s4_brand",    "slide": 4, "selector": "[data-slot='s4_brand']",    "type": "text", "label": "Handwritten Brand",      "maxChars": 40},
+      {"id": "s4_eyebrow",  "slide": 4, "selector": "[data-slot='s4_eyebrow']",  "type": "text", "label": "Section Eyebrow",        "maxChars": 60},
+      {"id": "s4_title",    "slide": 4, "selector": "[data-slot='s4_title']",    "type": "text", "label": "Point 3 Title",          "maxChars": 100},
+      {"id": "s4_body",     "slide": 4, "selector": "[data-slot='s4_body']",     "type": "text", "label": "Point 3 Body",           "maxChars": 400},
+      {"id": "s4_note",     "slide": 4, "selector": "[data-slot='s4_note']",     "type": "text", "label": "Handwritten Note",       "maxChars": 60},
+      {"id": "s4_bg_brand", "slide": 4, "selector": "[data-slot='s4_bg_brand']", "type": "text", "label": "BG Brand Label",         "maxChars": 30},
+
+      {"id": "s5_brand",     "slide": 5, "selector": "[data-slot='s5_brand']",     "type": "text", "label": "Handwritten Brand",    "maxChars": 40},
+      {"id": "s5_eyebrow",   "slide": 5, "selector": "[data-slot='s5_eyebrow']",   "type": "text", "label": "Stat Eyebrow",         "maxChars": 40},
+      {"id": "s5_stat",      "slide": 5, "selector": "[data-slot='s5_stat']",      "type": "text", "label": "Big Handwritten Stat", "maxChars": 10},
+      {"id": "s5_stat_desc", "slide": 5, "selector": "[data-slot='s5_stat_desc']", "type": "text", "label": "Stat Description",     "maxChars": 80},
+      {"id": "s5_body",      "slide": 5, "selector": "[data-slot='s5_body']",      "type": "text", "label": "Stat Context Body",    "maxChars": 200},
+      {"id": "s5_source",    "slide": 5, "selector": "[data-slot='s5_source']",    "type": "text", "label": "Source / Date",        "maxChars": 60},
+      {"id": "s5_bg_brand",  "slide": 5, "selector": "[data-slot='s5_bg_brand']",  "type": "text", "label": "BG Brand Label",       "maxChars": 30},
+
+      {"id": "s6_brand",       "slide": 6, "selector": "[data-slot='s6_brand']",       "type": "text", "label": "Handwritten Brand",  "maxChars": 40},
+      {"id": "s6_eyebrow",     "slide": 6, "selector": "[data-slot='s6_eyebrow']",     "type": "text", "label": "Quote Eyebrow",      "maxChars": 40},
+      {"id": "s6_quote",       "slide": 6, "selector": "[data-slot='s6_quote']",       "type": "text", "label": "Lora Italic Quote",  "maxChars": 160},
+      {"id": "s6_attribution", "slide": 6, "selector": "[data-slot='s6_attribution']", "type": "text", "label": "Attribution",        "maxChars": 60},
+      {"id": "s6_bg_brand",    "slide": 6, "selector": "[data-slot='s6_bg_brand']",    "type": "text", "label": "BG Brand Label",     "maxChars": 30},
+
+      {"id": "s7_brand",    "slide": 7, "selector": "[data-slot='s7_brand']",    "type": "text", "label": "Handwritten Brand",      "maxChars": 40},
+      {"id": "s7_title",    "slide": 7, "selector": "[data-slot='s7_title']",    "type": "text", "label": "Summary Title",          "maxChars": 80},
+      {"id": "s7_check1",   "slide": 7, "selector": "[data-slot='s7_check1']",   "type": "text", "label": "Checklist Item 1",       "maxChars": 120},
+      {"id": "s7_check2",   "slide": 7, "selector": "[data-slot='s7_check2']",   "type": "text", "label": "Checklist Item 2",       "maxChars": 120},
+      {"id": "s7_check3",   "slide": 7, "selector": "[data-slot='s7_check3']",   "type": "text", "label": "Checklist Item 3",       "maxChars": 120},
+      {"id": "s7_note",     "slide": 7, "selector": "[data-slot='s7_note']",     "type": "text", "label": "Handwritten Note",       "maxChars": 60},
+      {"id": "s7_bg_brand", "slide": 7, "selector": "[data-slot='s7_bg_brand']", "type": "text", "label": "BG Brand Label",         "maxChars": 30},
+
+      {"id": "s8_brand",     "slide": 8, "selector": "[data-slot='s8_brand']",     "type": "text", "label": "Handwritten Brand",   "maxChars": 40},
+      {"id": "s8_cta_title", "slide": 8, "selector": "[data-slot='s8_cta_title']", "type": "text", "label": "CTA Title",           "maxChars": 100},
+      {"id": "s8_body",      "slide": 8, "selector": "[data-slot='s8_body']",      "type": "text", "label": "Follow Pitch",        "maxChars": 200},
+      {"id": "s8_signoff",   "slide": 8, "selector": "[data-slot='s8_signoff']",   "type": "text", "label": "Handwritten Sign-off","maxChars": 60},
+      {"id": "s8_close",     "slide": 8, "selector": "[data-slot='s8_close']",     "type": "text", "label": "Closing Line",        "maxChars": 40},
+      {"id": "s8_bg_brand",  "slide": 8, "selector": "[data-slot='s8_bg_brand']",  "type": "text", "label": "BG Brand Label",      "maxChars": 30}
+    ]
+  }
+}
