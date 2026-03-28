@@ -9,6 +9,21 @@ import type { GeneratedCopy, Platform } from '@/types/carousel'
 
 type Step = 'chat' | 'review'
 
+function adjustSlides(
+  slides: GeneratedCopy['slides'],
+  targetCount: number
+): GeneratedCopy['slides'] {
+  if (slides.length === targetCount) return slides
+  if (slides.length > targetCount) return slides.slice(0, targetCount)
+  // Guard: empty array — pad with blank slides
+  if (slides.length === 0) {
+    return Array.from({ length: targetCount }, () => ({ headline: '', body: '' }))
+  }
+  const last = slides[slides.length - 1]
+  const extras = Array.from({ length: targetCount - slides.length }, () => ({ ...last }))
+  return [...slides, ...extras]
+}
+
 export default function GeneratePage() {
   const { user } = useAuth()
   const router = useRouter()
@@ -60,7 +75,13 @@ export default function GeneratePage() {
               copy={copy}
               onCopyChange={setCopy}
               onConfirm={handleConfirmScript}
-              slideCount={{ value: slideCount, onChange: setSlideCount }}
+              slideCount={{
+                value: slideCount,
+                onChange: (n: number) => {
+                  setSlideCount(n)
+                  setCopy(prev => prev ? { ...prev, slides: adjustSlides(prev.slides, n) } : prev)
+                },
+              }}
             />
           </div>
         )}

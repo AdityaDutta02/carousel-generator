@@ -19,7 +19,7 @@ function getClient(): OpenAI {
 export const CHEAP_MODEL =
   process.env.OPENROUTER_CHEAP_MODEL ?? 'deepseek/deepseek-chat'
 export const GOOD_MODEL =
-  process.env.OPENROUTER_GOOD_MODEL ?? 'anthropic/claude-haiku-4-5'
+  process.env.OPENROUTER_GOOD_MODEL ?? 'anthropic/claude-3.5-haiku'
 
 // ── Prompt builders ────────────────────────────────────────────────────────
 

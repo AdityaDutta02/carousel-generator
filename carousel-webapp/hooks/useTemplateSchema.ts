@@ -50,7 +50,7 @@ export function useTemplateSchema(templateId: string) {
         setState(prev => ({ ...prev, id: templateId, template: t, schema: t.schemaJson }))
         return fetch(`/api/template/${templateId}`)
       })
-      .then(res => res?.text())
+      .then(res => (res?.ok ? res.text() : undefined))
       .then(html => {
         if (cancelled) return
         if (html) setState(prev => ({ ...prev, id: templateId, templateHtml: html }))

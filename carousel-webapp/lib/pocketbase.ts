@@ -77,6 +77,7 @@ export async function listCarousels(ownerId: string): Promise<Carousel[]> {
   const result = await client.collection('carousels').getList(1, 50, {
     filter: `owner = "${ownerId}"`,
     sort: '-created',
+    requestKey: 'list-carousels',
   })
   return result.items.map(recordToCarousel)
 }
@@ -156,10 +157,13 @@ export async function publishTemplate(templateId: string): Promise<Template> {
  */
 export async function verifyToken(token: string): Promise<Record<string, unknown> | null> {
   try {
-    const pb = getPocketBase()
-    // Use PocketBase's built-in auth refresh to validate the token
-    pb.authStore.save(token, null)
-    const authData = await pb.collection('users').authRefresh()
+    // Use a fresh instance so we never mutate the shared module-level singleton.
+    // This instance is discarded after verification completes.
+    const freshPb = new PocketBase(
+      process.env.NEXT_PUBLIC_POCKETBASE_URL ?? 'http://127.0.0.1:8090'
+    )
+    freshPb.authStore.save(token, null)
+    const authData = await freshPb.collection('users').authRefresh()
     return authData.record as Record<string, unknown>
   } catch {
     return null

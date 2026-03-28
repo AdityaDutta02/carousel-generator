@@ -37,6 +37,7 @@ export const SlidePreview = forwardRef<SlidePreviewHandle, SlidePreviewProps>(
 
     useEffect(() => {
       function handleMessage(e: MessageEvent) {
+        if (e.source !== iframeRef.current?.contentWindow) return
         if (!e.data || typeof e.data !== 'object') return
         if (e.data.type === 'SLOT_CLICK') {
           onSlotClick({ slotId: e.data.slotId, currentValue: e.data.currentValue })
@@ -62,7 +63,7 @@ export const SlidePreview = forwardRef<SlidePreviewHandle, SlidePreviewProps>(
           ref={iframeRef}
           title="slide-preview"
           srcDoc={srcdoc}
-          sandbox="allow-scripts"
+          sandbox="allow-scripts allow-same-origin"
           className="absolute top-0 left-0 border-0"
           style={{
             width: canvasWidth,

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,8 +15,17 @@ interface TemplateCardProps {
 
 export function TemplateCard({ template, onSelect, onPublished, isSelected }: TemplateCardProps) {
   const [isPublishing, setIsPublishing] = useState(false)
+  const [htmlContent, setHtmlContent] = useState<string | null>(null)
   const isAdmin = (pb.authStore.model as { role?: string } | null)?.role === 'admin'
   const canPublish = isAdmin && template.scope === 'user'
+
+  useEffect(() => {
+    if (!template.htmlFileUrl || template.thumbnailUrl) return
+    fetch(template.htmlFileUrl)
+      .then(res => res.text())
+      .then(html => setHtmlContent(html))
+      .catch(() => {}) // silently ignore — "No preview" fallback handles it
+  }, [template.htmlFileUrl, template.thumbnailUrl])
 
   const handlePublish = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -48,9 +57,9 @@ export function TemplateCard({ template, onSelect, onPublished, isSelected }: Te
             fill
             className="object-cover"
           />
-        ) : template.htmlFileUrl ? (
+        ) : htmlContent ? (
           <iframe
-            src={template.htmlFileUrl}
+            srcDoc={htmlContent}
             title={template.name}
             style={{
               position: 'absolute',

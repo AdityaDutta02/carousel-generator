@@ -112,7 +112,10 @@ export default function NewTemplatePage() {
     try {
       const res = await fetch('/api/ai/generate-template', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${pb.authStore.token}`,
+        },
         body: JSON.stringify({ images, description: description || undefined }),
       })
       if (!res.ok) {

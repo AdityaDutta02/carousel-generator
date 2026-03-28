@@ -39,13 +39,16 @@ function CarouselCard({ carousel }: { carousel: Carousel }): React.JSX.Element {
 
 export default function DashboardPage(): React.JSX.Element {
   const [carousels, setCarousels] = useState<Carousel[]>([])
-  const [loading, setLoading] = useState(() => Boolean(getPocketBase().authStore.model))
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const pb = getPocketBase()
     const user = pb.authStore.model
-    if (!user) return
+    if (!user) {
+      setLoading(false)
+      return
+    }
     listCarousels(user.id as string)
       .then(setCarousels)
       .catch((err: unknown) => {
@@ -58,7 +61,7 @@ export default function DashboardPage(): React.JSX.Element {
     <div className="p-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold text-zinc-100">My Carousels</h1>
-        <Link href="/templates">
+        <Link href="/generate">
           <Button className="bg-orange-500 hover:bg-orange-600 text-white" data-testid="new-carousel-btn">
             New Carousel
           </Button>
