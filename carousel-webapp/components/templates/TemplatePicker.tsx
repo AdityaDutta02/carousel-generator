@@ -23,7 +23,7 @@ export function TemplatePicker({ onSelect, selectedId }: TemplatePickerProps) {
   useEffect(() => {
     const pb = getPocketBase()
     pb.collection('templates')
-      .getList(1, 50, { sort: 'scope,name' })
+      .getList(1, 50, { sort: 'scope,name', requestKey: 'template-list' })
       .then(result => {
         setTemplates(result.items.map(r => ({
           id: r.id,

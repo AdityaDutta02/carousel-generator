@@ -31,8 +31,9 @@ export async function POST(req: NextRequest): Promise<Response> {
   try {
     stream = await streamCopyGeneration(body.messages, userContext)
   } catch (err) {
-    console.error('[generate-copy] OpenRouter error:', err)
-    return NextResponse.json({ error: 'AI service error. Please try again.' }, { status: 502 })
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[generate-copy] OpenRouter error:', message)
+    return NextResponse.json({ error: `AI error: ${message}` }, { status: 502 })
   }
 
   return new Response(stream.pipeThrough(new TextEncoderStream()), {
