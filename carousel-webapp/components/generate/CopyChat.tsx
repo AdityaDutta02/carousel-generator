@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import type { GeneratedCopy, Platform } from '@/types/carousel'
 import { useAuth } from '@/hooks/useAuth'
-import { getUserContext } from '@/lib/pocketbase'
+import { getUserContext, getPocketBase } from '@/lib/pocketbase'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -51,9 +51,13 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
     let fullResponse = ''
 
     try {
+      const token = getPocketBase().authStore.token
       const res = await fetch('/api/ai/generate-copy', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({ messages: newMessages, userContext }),
         signal: abortRef.current.signal,
       })

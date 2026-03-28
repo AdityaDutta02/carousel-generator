@@ -44,12 +44,12 @@ export async function createCarousel(
   const record = await client.collection('carousels').create({
     owner: data.owner,
     title: data.title,
-    template: data.templateId || null,
+    template_id: data.templateId || null,
     platform: data.platform,
     canvas_width: data.canvasWidth,
     canvas_height: data.canvasHeight,
     slide_count: data.slideCount,
-    slides_json: data.slides,
+    slides: data.slides,
     status: data.status,
   })
   return recordToCarousel(record)
@@ -62,7 +62,8 @@ export async function updateCarousel(
   const client = getPocketBase()
   const record = await client.collection('carousels').update(id, {
     title: data.title,
-    slides_json: data.slides,
+    template_id: data.templateId !== undefined ? (data.templateId || null) : undefined,
+    slides: data.slides,
     status: data.status,
     slide_count: data.slideCount,
     canvas_width: data.canvasWidth,
@@ -91,12 +92,12 @@ function recordToCarousel(r: Record<string, unknown>): Carousel {
     id: String(r['id']),
     owner: String(r['owner']),
     title: String(r['title'] ?? ''),
-    templateId: String(r['template'] ?? ''),
-    platform: r['platform'] as Carousel['platform'],
-    canvasWidth: Number(r['canvas_width']),
-    canvasHeight: Number(r['canvas_height']),
+    templateId: String(r['template_id'] ?? ''),
+    platform: (r['platform'] as Carousel['platform']) ?? 'linkedin',
+    canvasWidth: Number(r['canvas_width']) || 1080,
+    canvasHeight: Number(r['canvas_height']) || 1350,
     slideCount: Number(r['slide_count']),
-    slides: (r['slides_json'] as Slide[]) ?? [],
+    slides: (r['slides'] as Slide[]) ?? [],
     status: (r['status'] as Carousel['status']) ?? 'draft',
     created: String(r['created']),
     updated: String(r['updated']),
