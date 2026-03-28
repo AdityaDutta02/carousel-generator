@@ -21,5 +21,6 @@ describe('useAuth', () => {
     const { result } = renderHook(() => useAuth())
     expect(result.current.user).toBeNull()
     expect(result.current.isLoading).toBe(false)
+    expect(result.current.isInitialized).toBe(true)
   })
 })

@@ -41,16 +41,22 @@ async function runWithLoading(
 
 export function useAuth() {
   const pb = getPocketBase()
-  const [user, setUser] = useState<AuthUser | null>(null)
+  const [authState, setAuthState] = useState<{ user: AuthUser | null; isInitialized: boolean }>({
+    user: null,
+    isInitialized: false,
+  })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     // Read auth state client-side only so server and client initial render agree (null).
-    const syncUser = () => setUser(getAuthUser(pb))
+    // isInitialized gates redirect logic — prevents redirect before this effect runs.
+    const syncUser = () => setAuthState({ user: getAuthUser(pb), isInitialized: true })
     syncUser()
     return pb.authStore.onChange(syncUser)
   }, [pb])
+
+  const { user, isInitialized } = authState
 
   const login = useCallback(
     (email: string, password: string): Promise<void> =>
@@ -86,5 +92,5 @@ export function useAuth() {
     pb.authStore.clear()
   }, [pb])
 
-  return { user, isLoading, error, login, register, logout }
+  return { user, isInitialized, isLoading, error, login, register, logout }
 }

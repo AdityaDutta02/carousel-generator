@@ -59,15 +59,15 @@ function Sidebar({ pathname, onLogout }: SidebarProps) {
 }
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth()
+  const { user, isInitialized, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
 
   useEffect(() => {
-    if (user === null) { router.replace('/login') }
-  }, [user, router])
+    if (isInitialized && user === null) { router.replace('/login') }
+  }, [user, isInitialized, router])
 
-  if (user === null) { return <LoadingScreen /> }
+  if (!isInitialized || user === null) { return <LoadingScreen /> }
 
   return (
     <div className="flex min-h-screen" data-testid="app-shell">
