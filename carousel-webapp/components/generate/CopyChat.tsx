@@ -29,6 +29,7 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [platform, setPlatform] = useState<Platform>('linkedin')
+  const [slideCount, setSlideCount] = useState(5)
   const [isStreaming, setIsStreaming] = useState(false)
   const [pendingCopy, setPendingCopy] = useState<GeneratedCopy | null>(null)
   const [streamBuffer, setStreamBuffer] = useState('')
@@ -58,7 +59,7 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ messages: newMessages, userContext }),
+        body: JSON.stringify({ messages: newMessages, userContext, slideCount }),
         signal: abortRef.current.signal,
       })
 
@@ -83,7 +84,8 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
       }
 
       try {
-        const parsed = JSON.parse(fullResponse.trim()) as GeneratedCopy
+        const cleaned = fullResponse.trim().replace(/^```json\s*/i, '').replace(/\s*```$/, '')
+        const parsed = JSON.parse(cleaned) as GeneratedCopy
         if (parsed.hook && parsed.slides && parsed.cta) {
           setPendingCopy(parsed)
           setMessages(prev => [
@@ -122,19 +124,34 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
   return (
     <div className="flex flex-col h-full gap-4" data-testid="copy-chat">
       {isFirstMessage && (
-        <div className="flex gap-2 flex-wrap">
-          <span className="text-sm text-zinc-400 self-center">Platform:</span>
-          {PLATFORMS.map(p => (
-            <Badge
-              key={p.value}
-              variant={platform === p.value ? 'default' : 'outline'}
-              className="cursor-pointer select-none"
-              onClick={() => setPlatform(p.value)}
-              data-testid={`platform-badge-${p.value}`}
-            >
-              {p.label}
-            </Badge>
-          ))}
+        <div className="space-y-2">
+          <div className="flex gap-2 flex-wrap">
+            <span className="text-sm text-zinc-400 self-center">Platform:</span>
+            {PLATFORMS.map(p => (
+              <Badge
+                key={p.value}
+                variant={platform === p.value ? 'default' : 'outline'}
+                className="cursor-pointer select-none"
+                onClick={() => setPlatform(p.value)}
+                data-testid={`platform-badge-${p.value}`}
+              >
+                {p.label}
+              </Badge>
+            ))}
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <span className="text-sm text-zinc-400 self-center">Slides:</span>
+            {[3, 5, 7, 10].map(n => (
+              <Badge
+                key={n}
+                variant={slideCount === n ? 'default' : 'outline'}
+                className="cursor-pointer select-none"
+                onClick={() => setSlideCount(n)}
+              >
+                {n}
+              </Badge>
+            ))}
+          </div>
         </div>
       )}
 

@@ -25,11 +25,15 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   const body = (await req.json()) as {
     messages: Array<{ role: 'user' | 'assistant'; content: string }>
+    slideCount?: number
   }
+  const slideCount = typeof body.slideCount === 'number' && body.slideCount > 0
+    ? body.slideCount
+    : 5
 
   let stream: ReadableStream<string>
   try {
-    stream = await streamCopyGeneration(body.messages, userContext)
+    stream = await streamCopyGeneration(body.messages, userContext, slideCount)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     console.error('[generate-copy] OpenRouter error:', message)

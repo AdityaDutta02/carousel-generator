@@ -23,7 +23,7 @@ export const GOOD_MODEL =
 
 // ── Prompt builders ────────────────────────────────────────────────────────
 
-export function buildCopyGenSystemPrompt(ctx: UserContext | null): string {
+export function buildCopyGenSystemPrompt(ctx: UserContext | null, slideCount = 5): string {
   const userBlock = ctx
     ? `## Creator Context
 Brand: ${ctx.brand}
@@ -41,8 +41,10 @@ Write in this creator's voice and for their specific audience.`
 ${userBlock}
 
 ## Output Rules (STRICT)
-- Output JSON only — no prose, no markdown fences, no explanation
+- Output ONLY a raw JSON object — absolutely no markdown, no \`\`\`json fences, no explanation, no prose before or after
+- Your entire response must start with { and end with }
 - JSON schema: { "hook": string, "slides": [{ "headline": string, "body": string, "stat"?: string, "quote"?: string }], "cta": string }
+- slides array must contain exactly ${slideCount} items
 - hook: max 12 words, must create immediate curiosity or bold claim
 - headline: max 8 words per slide, punchy
 - body: max 40 words per slide, one clear idea
@@ -85,13 +87,14 @@ export function buildSlotFillPrompt(
 
 export async function streamCopyGeneration(
   messages: OpenAI.ChatCompletionMessageParam[],
-  userContext: UserContext | null
+  userContext: UserContext | null,
+  slideCount = 5
 ): Promise<ReadableStream<string>> {
   const openai = getClient()
   const stream = await openai.chat.completions.create({
     model: CHEAP_MODEL,
     messages: [
-      { role: 'system', content: buildCopyGenSystemPrompt(userContext) },
+      { role: 'system', content: buildCopyGenSystemPrompt(userContext, slideCount) },
       ...messages,
     ],
     stream: true,
