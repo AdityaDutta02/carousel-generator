@@ -53,6 +53,10 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
     getCaptureWindow().__captureResolve = null
   }, [])
 
+  useEffect(() => {
+    previewRef.current?.switchSlide(activeSlideIndex)
+  }, [activeSlideIndex])
+
   const handleSlotClick = useCallback(({ slotId }: { slotId: string; currentValue: string }) => {
     if (!schema) return
     const slotDef = schema.slots.find(s => s.id === slotId) ?? null
@@ -85,8 +89,8 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
 
   async function handleExport(): Promise<void> {
     await exportZip(previewRef, async (index) => {
-      setActiveSlideIndex(index)
-      await new Promise(r => setTimeout(r, 400))
+      previewRef.current?.switchSlide(index)
+      await new Promise(r => setTimeout(r, 150))
     })
     const dismissed = localStorage.getItem('brand_prompt_dismissed') === 'true'
     if (!isFilled && !dismissed) {
@@ -108,8 +112,11 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
     ? currentSlide.slots[activeSlot.id] ?? activeSlot.default ?? ''
     : ''
 
+  const activeCanvasWidth = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.width ?? 1080
+  const activeCanvasHeight = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.height ?? 1350
   const srcdoc = templateHtml && schema && carousel.slides.length > 0
-    ? buildSrcdoc(templateHtml, schema, carousel.slides, activeSlideIndex)
+    ? buildSrcdoc(templateHtml, schema, carousel.slides, 0,
+        { canvasWidth: activeCanvasWidth, canvasHeight: activeCanvasHeight })
     : `<html><body style="background:#1a1a1a;display:flex;align-items:center;justify-content:center;height:100vh;color:#666;font-family:sans-serif"><p>Select a template to start</p></body></html>`
 
   return (
@@ -130,8 +137,8 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
         <SlidePreview
           ref={previewRef}
           srcdoc={srcdoc}
-          canvasWidth={CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.width ?? 1080}
-          canvasHeight={CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.height ?? 1350}
+          canvasWidth={activeCanvasWidth}
+          canvasHeight={activeCanvasHeight}
           onSlotClick={handleSlotClick}
           onCaptureResult={handleCaptureResult}
         />
