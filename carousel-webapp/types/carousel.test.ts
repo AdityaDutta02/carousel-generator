@@ -1,5 +1,5 @@
 import { describe, it, expectTypeOf } from 'vitest'
-import type { Carousel, Slide, SlotValue, CarouselStatus } from './carousel'
+import type { Carousel, SlotValue, CarouselStatus } from './carousel'
 
 describe('Carousel types', () => {
   it('Carousel has required fields', () => {

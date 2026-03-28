@@ -39,7 +39,6 @@ export function useCarousel(id: string): {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    setIsLoading(true)
     getCarousel(id)
       .then(setCarousel)
       .catch(() => setError('Failed to load carousel'))

@@ -7,11 +7,10 @@ export function useTemplateSchema(templateId: string) {
   const [template, setTemplate] = useState<Template | null>(null)
   const [schema, setSchema] = useState<SchemaJson | null>(null)
   const [templateHtml, setTemplateHtml] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(Boolean(templateId))
 
   useEffect(() => {
     if (!templateId) return
-    setIsLoading(true)
     const pb = getPocketBase()
     pb.collection('templates')
       .getOne(templateId)
