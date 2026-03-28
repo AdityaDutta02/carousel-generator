@@ -5,6 +5,12 @@ import { TemplateCard } from './TemplateCard'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Template, SchemaJson } from '@/types/template'
 
+function parsePlatformTags(value: unknown): string[] {
+  if (Array.isArray(value)) return value as string[]
+  if (typeof value === 'string') return value.split(',').filter(Boolean)
+  return []
+}
+
 interface TemplatePickerProps {
   onSelect: (template: Template) => void
   selectedId?: string
@@ -29,7 +35,7 @@ export function TemplatePicker({ onSelect, selectedId }: TemplatePickerProps) {
           thumbnailUrl: r.thumbnail ? pb.files.getURL(r, r.thumbnail as string) : '',
           canvasWidth: r.canvas_width as number,
           canvasHeight: r.canvas_height as number,
-          platformTags: (r.platform_tags as string[]) ?? [],
+          platformTags: parsePlatformTags(r.platform_tags),
           slideCountDefault: r.slide_count_default as number,
         })))
       })

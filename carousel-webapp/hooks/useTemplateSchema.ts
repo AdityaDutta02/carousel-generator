@@ -3,6 +3,12 @@ import { useState, useEffect } from 'react'
 import { getPocketBase } from '@/lib/pocketbase'
 import type { Template, SchemaJson } from '@/types/template'
 
+function parsePlatformTags(value: unknown): string[] {
+  if (Array.isArray(value)) return value as string[]
+  if (typeof value === 'string') return value.split(',').filter(Boolean)
+  return []
+}
+
 export function useTemplateSchema(templateId: string) {
   const [state, setState] = useState<{
     id: string
@@ -23,7 +29,7 @@ export function useTemplateSchema(templateId: string) {
     let cancelled = false
     const pb = getPocketBase()
     pb.collection('templates')
-      .getOne(templateId)
+      .getOne(templateId, { requestKey: `template-${templateId}` })
       .then(record => {
         if (cancelled) return undefined
         const t: Template = {
@@ -38,10 +44,7 @@ export function useTemplateSchema(templateId: string) {
             : '',
           canvasWidth: (record.canvas_width as number) || 1080,
           canvasHeight: (record.canvas_height as number) || 1350,
-          platformTags:
-            typeof record.platform_tags === 'string'
-              ? record.platform_tags.split(',').filter(Boolean)
-              : [],
+          platformTags: parsePlatformTags(record.platform_tags),
           slideCountDefault: (record.slide_count_default as number) || 5,
         }
         setState(prev => ({ ...prev, id: templateId, template: t, schema: t.schemaJson }))
