@@ -39,16 +39,13 @@ function CarouselCard({ carousel }: { carousel: Carousel }): React.JSX.Element {
 
 export default function DashboardPage(): React.JSX.Element {
   const [carousels, setCarousels] = useState<Carousel[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(() => Boolean(getPocketBase().authStore.model))
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const pb = getPocketBase()
     const user = pb.authStore.model
-    if (!user) {
-      setLoading(false)
-      return
-    }
+    if (!user) return
     listCarousels(user.id as string)
       .then(setCarousels)
       .catch((err: unknown) => {

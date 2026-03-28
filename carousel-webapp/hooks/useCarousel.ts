@@ -3,6 +3,13 @@ import { useState, useEffect, useCallback, useRef, Dispatch, SetStateAction } fr
 import { getCarousel, updateCarousel } from '@/lib/pocketbase'
 import type { Carousel, Slide } from '@/types/carousel'
 
+interface LoadState {
+  id: string
+  carousel: Carousel | null
+  isLoading: boolean
+  error: string | null
+}
+
 /** Builds an updated Carousel with the given slides, schedules an autosave, and returns it. */
 function applySlideUpdate(
   prev: Carousel,
@@ -33,17 +40,19 @@ export function useCarousel(id: string): {
   updateGlobalSlot: (slotId: string, value: string) => void
   setCarousel: Dispatch<SetStateAction<Carousel | null>>
 } {
-  const [carousel, setCarousel] = useState<Carousel | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [state, setState] = useState<LoadState>({ id, carousel: null, isLoading: true, error: null })
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    setIsLoading(true)
+    let cancelled = false
     getCarousel(id)
-      .then(setCarousel)
-      .catch(() => setError('Failed to load carousel'))
-      .finally(() => setIsLoading(false))
+      .then(carousel => {
+        if (!cancelled) setState({ id, carousel, isLoading: false, error: null })
+      })
+      .catch(() => {
+        if (!cancelled) setState({ id, carousel: null, isLoading: false, error: 'Failed to load carousel' })
+      })
+    return () => { cancelled = true }
   }, [id])
 
   const scheduleAutosave = useCallback((updated: Carousel): void => {
@@ -52,6 +61,17 @@ export function useCarousel(id: string): {
       updateCarousel(updated.id, updated).catch(console.error)
     }, 1500)
   }, [])
+
+  // setCarousel exposed to consumers — wraps the combined state setter
+  const setCarousel: Dispatch<SetStateAction<Carousel | null>> = useCallback(
+    (action) => {
+      setState(prev => {
+        const next = typeof action === 'function' ? action(prev.carousel) : action
+        return { ...prev, carousel: next }
+      })
+    },
+    []
+  )
 
   const updateSlot = useCallback(
     (slideIndex: number, slotId: string, value: string): void => {
@@ -62,7 +82,7 @@ export function useCarousel(id: string): {
         return applySlideUpdate(prev, slides, scheduleAutosave)
       })
     },
-    [scheduleAutosave]
+    [setCarousel, scheduleAutosave]
   )
 
   const updateGlobalSlot = useCallback(
@@ -75,8 +95,12 @@ export function useCarousel(id: string): {
         return applySlideUpdate(prev, slides, scheduleAutosave)
       })
     },
-    [scheduleAutosave]
+    [setCarousel, scheduleAutosave]
   )
+
+  const carousel = state.id === id ? state.carousel : null
+  const error = state.id === id ? state.error : null
+  const isLoading = state.id !== id || state.isLoading
 
   return { carousel, isLoading, error, updateSlot, updateGlobalSlot, setCarousel }
 }

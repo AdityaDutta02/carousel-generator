@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { renderHook } from '@testing-library/react'
 import { useAuth } from './useAuth'
 
 vi.mock('@/lib/pocketbase', () => ({
