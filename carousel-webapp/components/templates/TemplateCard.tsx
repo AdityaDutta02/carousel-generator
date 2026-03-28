@@ -56,11 +56,10 @@ export function TemplateCard({ template, onSelect, onPublished, isSelected }: Te
               width: '540px',
               height: '675px',
               transformOrigin: 'top left',
-              transform: 'scale(0.37)',
+              transform: 'scale(0.5)',
               border: 'none',
               pointerEvents: 'none',
             }}
-            sandbox="allow-same-origin"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-zinc-600 text-sm">
