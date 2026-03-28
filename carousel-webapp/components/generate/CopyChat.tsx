@@ -155,9 +155,9 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
             {m.content}
           </div>
         ))}
-        {isStreaming && streamBuffer && (
-          <div className="text-sm text-zinc-400 animate-pulse" data-testid="stream-buffer">
-            {streamBuffer}
+        {isStreaming && (
+          <div className="text-sm text-zinc-500 animate-pulse" data-testid="stream-buffer">
+            Writing your script…
           </div>
         )}
       </div>
@@ -179,24 +179,44 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
       )}
 
       {pendingCopy && (
-        <div className="flex gap-2" data-testid="copy-approval-bar">
-          <Button
-            onClick={() => onCopyApproved(pendingCopy, platform)}
-            className="flex-1"
-            data-testid="approve-copy-btn"
-          >
-            Approve &amp; Choose Template →
-          </Button>
-          <Button
-            variant="outline"
-            data-testid="try-another-angle-btn"
-            onClick={() => {
-              setPendingCopy(null)
-              sendMessage('Give me a different angle')
-            }}
-          >
-            Try another angle
-          </Button>
+        <div className="space-y-3" data-testid="copy-approval-bar">
+          <div className="rounded-lg border border-zinc-800 p-4 space-y-3 text-sm max-h-64 overflow-y-auto">
+            <div>
+              <p className="text-xs text-zinc-500 uppercase tracking-widest mb-1">Hook</p>
+              <p className="text-white font-semibold">{pendingCopy.hook}</p>
+            </div>
+            <div className="space-y-2">
+              {pendingCopy.slides.map((slide, i) => (
+                <div key={i} className="border-l-2 border-zinc-700 pl-3">
+                  <p className="text-zinc-300 font-medium">{slide.headline}</p>
+                  <p className="text-zinc-500">{slide.body}</p>
+                </div>
+              ))}
+            </div>
+            <div>
+              <p className="text-xs text-zinc-500 uppercase tracking-widest mb-1">CTA</p>
+              <p className="text-zinc-300">{pendingCopy.cta}</p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => onCopyApproved(pendingCopy, platform)}
+              className="flex-1"
+              data-testid="approve-copy-btn"
+            >
+              Approve &amp; Choose Template →
+            </Button>
+            <Button
+              variant="outline"
+              data-testid="try-another-angle-btn"
+              onClick={() => {
+                setPendingCopy(null)
+                sendMessage('Give me a different angle')
+              }}
+            >
+              Try another angle
+            </Button>
+          </div>
         </div>
       )}
 
