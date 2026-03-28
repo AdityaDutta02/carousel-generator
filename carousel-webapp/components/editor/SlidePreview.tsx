@@ -18,6 +18,7 @@ interface SlidePreviewProps {
 export interface SlidePreviewHandle {
   capture: () => void
   sendUpdate: (slotId: string, value: string) => void
+  switchSlide: (index: number) => void
 }
 
 export const SlidePreview = forwardRef<SlidePreviewHandle, SlidePreviewProps>(
@@ -33,6 +34,8 @@ export const SlidePreview = forwardRef<SlidePreviewHandle, SlidePreviewProps>(
       capture: () => sendMessage({ type: 'CAPTURE' }),
       sendUpdate: (slotId: string, value: string) =>
         sendMessage({ type: 'UPDATE_SLOT', slotId, value }),
+      switchSlide: (index: number) =>
+        sendMessage({ type: 'SWITCH_SLIDE', index }),
     }))
 
     useEffect(() => {
