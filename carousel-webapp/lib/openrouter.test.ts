@@ -23,7 +23,7 @@ describe('buildCopyGenSystemPrompt', () => {
 
   it('enforces JSON-only output rule', () => {
     const prompt = buildCopyGenSystemPrompt(mockCtx)
-    expect(prompt).toContain('JSON only')
+    expect(prompt).toContain('raw JSON object')
   })
 
   it('includes word limits', () => {
