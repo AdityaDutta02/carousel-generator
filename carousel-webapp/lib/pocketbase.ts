@@ -77,14 +77,14 @@ export async function listCarousels(ownerId: string): Promise<Carousel[]> {
   const result = await client.collection('carousels').getList(1, 50, {
     filter: `owner = "${ownerId}"`,
     sort: '-created',
-    requestKey: 'list-carousels',
+    requestKey: null,
   })
   return result.items.map(recordToCarousel)
 }
 
 export async function getCarousel(id: string): Promise<Carousel> {
   const client = getPocketBase()
-  const record = await client.collection('carousels').getOne(id)
+  const record = await client.collection('carousels').getOne(id, { requestKey: null })
   return recordToCarousel(record)
 }
 
