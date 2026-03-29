@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE 2 — DARK DATA  ·  8-slide carousel
+  Palette: near-black bg · off-white text · orange accent
+  Fonts:   Barlow Condensed (headlines/numbers) · DM Sans (body/UI) · Lora italic (labels/quotes)
+
+  HOW TO EDIT:
+  1. Change design tokens in :root for whole-carousel retheme.
+  2. Search <!-- EDIT --> — every content placeholder is marked.
+  3. Each slide header comment lists exactly what to change.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Template 2 — Dark Data · 8 Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Lora:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+<style>
+
+/* ── DESIGN TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg:     #111110;   /* EDIT: slide background */
+  --text:   #FAFAF8;   /* EDIT: primary text color */
+  --accent: #E05828;   /* EDIT: orange — stat units, accented words, arrows */
+  --muted:  rgba(250,250,248,0.45);
+
+  /* EDIT: font sizes */
+  --sz-cover:    180px;
+  --sz-stat:     300px;
+  --sz-stat-2:   260px;
+  --sz-headline: 130px;
+  --sz-quote:     62px;
+  --sz-body:      34px;
+  --sz-tag:       22px;
+  --sz-eyebrow:   20px;
+  --sz-brand:     20px;
+  --sz-tagline:   30px;
+  --sz-lbl:       52px;
+  --sz-caption:   34px;
+  --sz-opinion:   42px;
+}
+
+/* ── RESET ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── SHELL ──────────────────────────────────────────────────────── */
+body {
+  background: #0a0a0a;
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 48px 24px; gap: 28px;
+  font-family: 'DM Sans', sans-serif;
+}
+.page-label {
+  color: rgba(255,255,255,0.28);
+  font-size: 12px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+}
+
+/* ── VIEWER ─────────────────────────────────────────────────────── */
+.viewer {
+  position: relative;
+  width: 540px; height: 675px;
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 48px 96px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06);
+  cursor: default;
+}
+
+/* ── SLIDE ──────────────────────────────────────────────────────── */
+.slide {
+  position: absolute; inset: 0;
+  width: 1080px; height: 1350px;
+  transform: scale(0.5); transform-origin: top left;
+  background: var(--bg); color: var(--text);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* ── SLIDE INNER ────────────────────────────────────────────────── */
+.si {
+  width: 100%; height: 100%;
+  padding: 72px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ── STRUCTURAL ROWS ────────────────────────────────────────────── */
+.top    { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+.top-left { display: flex; align-items: center; gap: 16px; }
+
+/* ── PILL TAG ───────────────────────────────────────────────────── */
+.tag {
+  display: inline-flex; align-items: center; gap: 10px;
+  border: 2px solid currentColor; border-radius: 100px;
+  padding: 11px 26px;
+  font-size: var(--sz-tag); font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  white-space: nowrap; line-height: 1; color: var(--text);
+}
+.tag svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* ── CIRCLE BUTTON ──────────────────────────────────────────────── */
+.circle-btn {
+  width: 84px; height: 84px; border-radius: 50%;
+  border: 2.5px solid currentColor;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.circle-btn svg { width: 34px; height: 34px; }
+
+/* ── LABELS ─────────────────────────────────────────────────────── */
+.eyebrow {
+  font-size: var(--sz-eyebrow); font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+.brand {
+  font-size: var(--sz-brand); font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+.star { font-size: 50px; line-height: 1; color: var(--accent); }
+.source {
+  font-size: 22px; font-weight: 300;
+  letter-spacing: 0.02em; color: var(--muted);
+  display: block; margin-top: 24px;
+}
+
+/* ── TAGLINE ────────────────────────────────────────────────────── */
+.tagline {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: var(--sz-tagline); line-height: 1.52;
+  max-width: 380px; text-align: right; color: var(--muted);
+}
+
+/* ── COVER HEADLINE ─────────────────────────────────────────────── */
+.headline-cover {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-cover); font-weight: 900;
+  line-height: 0.88; text-transform: uppercase;
+  letter-spacing: -0.015em; margin-top: 36px;
+}
+.headline-cover .ac { color: var(--accent); }
+
+/* ── INNER HEADLINE ─────────────────────────────────────────────── */
+.headline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-headline); font-weight: 900;
+  line-height: 0.9; text-transform: uppercase;
+  letter-spacing: -0.015em;
+}
+.headline .ac { color: var(--accent); }
+
+/* ── STAT NUMBER ────────────────────────────────────────────────── */
+.big-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: var(--sz-stat); font-weight: 900;
+  line-height: 0.83; letter-spacing: -0.025em;
+}
+.big-num.sm { font-size: var(--sz-stat-2); }
+.big-num .unit { color: var(--accent); }
+.data-row { display: flex; align-items: center; gap: 24px; margin-top: 18px; }
+.data-lbl {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: var(--sz-lbl);
+}
+
+/* ── BODY / CAPTION ─────────────────────────────────────────────── */
+.caption {
+  font-size: var(--sz-caption); font-weight: 300;
+  line-height: 1.52; max-width: 840px;
+}
+.caption strong { color: var(--accent); font-weight: 600; }
+.body-text {
+  font-size: var(--sz-body); font-weight: 300;
+  line-height: 1.58; max-width: 840px;
+}
+.body-text strong { color: var(--accent); font-weight: 600; }
+
+/* ── PULL QUOTE ─────────────────────────────────────────────────── */
+.quote-block {
+  flex: 1; display: flex; flex-direction: column;
+  justify-content: center; gap: 40px;
+}
+.quote-text {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: var(--sz-quote); font-weight: 400;
+  line-height: 1.38; max-width: 920px;
+}
+.attribution {
+  font-size: 24px; font-weight: 500;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+}
+
+/* ── THREE POINTS ───────────────────────────────────────────────── */
+.points { display: flex; flex-direction: column; gap: 0; }
+.point-item {
+  padding: 44px 0; border-top: 1px solid rgba(250,250,248,0.1);
+  display: flex; align-items: flex-start; gap: 36px;
+}
+.point-item:last-child { border-bottom: 1px solid rgba(250,250,248,0.1); }
+.point-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 56px; font-weight: 900; line-height: 1;
+  color: var(--accent); flex-shrink: 0; width: 80px;
+}
+.point-text { font-size: 36px; font-weight: 300; line-height: 1.5; }
+.point-text strong { font-weight: 600; }
+
+/* ── OPINION BLOCK ──────────────────────────────────────────────── */
+.opinion {
+  font-family: 'Lora', serif; font-style: italic;
+  font-size: var(--sz-opinion); line-height: 1.55;
+  font-weight: 400; max-width: 900px; flex: 1;
+  display: flex; align-items: center;
+}
+
+/* ── CTA BLOCK ──────────────────────────────────────────────────── */
+.cta-block {
+  border-top: 1.5px solid rgba(250,250,248,0.12);
+  padding-top: 48px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+.cta-text {
+  font-size: 32px; font-weight: 300;
+  line-height: 1.55; max-width: 620px;
+}
+.cta-text strong { color: var(--accent); font-weight: 600; }
+
+/* ── CONTROLS ───────────────────────────────────────────────────── */
+.controls { display: flex; align-items: center; gap: 20px; }
+.nav-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s, border-color 0.18s, transform 0.12s;
+}
+.nav-btn:hover  { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.35); }
+.nav-btn:active { transform: scale(0.93); }
+.nav-btn svg { width: 17px; height: 17px; }
+.dots { display: flex; gap: 7px; }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.18); border: none; cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.dot.active { background: var(--accent); transform: scale(1.4); }
+.counter {
+  color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 500;
+  min-width: 44px; text-align: center; letter-spacing: 0.05em;
+}
+
+</style>
+</head>
+<body>
+
+<p class="page-label">Template 2 — Dark Data &nbsp;·&nbsp; 8 Slides</p>
+
+<div class="viewer" id="viewer">
+
+  <!-- ══ SLIDE 1 · COVER ══════════════════════════════════════════
+       EDIT: left tag, right tag, headline (3–4 lines, add .ac
+             to any word for orange), tagline (2 lines)             -->
+  <div class="slide active" id="s1">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: left pill tag -->
+        <span class="tag" data-slot="s1_tag_left">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          CATEGORY
+        </span>
+        <!-- EDIT: right pill tag -->
+        <span class="tag" data-slot="s1_tag_right">
+          <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13L13 4M13 4H7M13 4V10"/></svg>
+          LABEL
+        </span>
+      </div>
+
+      <!-- EDIT: cover headline. Add class="ac" to a span/div for orange. -->
+      <div class="headline-cover">
+        <div data-slot="s1_headline_line1">LINE ONE</div>
+        <div data-slot="s1_headline_line2">LINE TWO</div>
+        <div class="ac" data-slot="s1_headline_accent">ACCENT LINE</div>
+        <div data-slot="s1_headline_line4">LINE FOUR.</div>
+      </div>
+
+      <div class="bottom">
+        <div class="circle-btn" style="color:var(--text);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+        </div>
+        <!-- EDIT: italic tagline, bottom-right -->
+        <p class="tagline" data-slot="s1_tagline">Your italic tagline<br>goes here.</p>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 2 · STAT 1 ═════════════════════════════════════════
+       EDIT: brand label, section label, big number, unit,
+             italic label, caption (wrap key phrase in <strong>)    -->
+  <div class="slide" id="s2">
+    <div class="si">
+
+      <div class="top">
+        <div class="top-left">
+          <span class="star">✳</span>
+          <!-- EDIT: section name in brackets -->
+          <span class="brand" data-slot="s2_brand">SECTION NAME</span>
+        </div>
+        <!-- EDIT: date or context -->
+        <span class="brand" data-slot="s2_date">DATE</span>
+      </div>
+
+      <div>
+        <!-- EDIT: big number + unit (M/B/K/%/x) -->
+        <div class="big-num" data-slot="s2_stat_num">42<span class="unit">M</span></div>
+        <div class="data-row">
+          <div class="circle-btn" style="color:var(--accent);border-color:var(--accent);">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+          </div>
+          <!-- EDIT: italic serif label next to arrow -->
+          <span class="data-lbl" data-slot="s2_stat_label">Italic label here.</span>
+        </div>
+      </div>
+
+      <!-- EDIT: caption — wrap key phrase in <strong> for orange -->
+      <p class="caption" data-slot="s2_caption">
+        Supporting sentence, punchy.<br>
+        Second sentence adds <strong>key phrase</strong> context.
+      </p>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 3 · STAT 2 ═════════════════════════════════════════
+       EDIT: section, date, big number, unit, label, caption        -->
+  <div class="slide" id="s3">
+    <div class="si">
+
+      <div class="top">
+        <div class="top-left">
+          <span class="star">✳</span>
+          <!-- EDIT: section name -->
+          <span class="brand" data-slot="s3_brand">SECTION NAME</span>
+        </div>
+        <span class="brand" data-slot="s3_date">DATE</span>
+      </div>
+
+      <div>
+        <!-- EDIT: second stat number (use .sm class for slightly smaller font) -->
+        <div class="big-num sm" data-slot="s3_stat_num">7<span class="unit">B</span></div>
+        <div class="data-row">
+          <div class="circle-btn" style="color:var(--accent);border-color:var(--accent);">
+            <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+          </div>
+          <!-- EDIT: italic serif label -->
+          <span class="data-lbl" data-slot="s3_stat_label">Italic label.</span>
+        </div>
+      </div>
+
+      <!-- EDIT: caption -->
+      <div>
+        <p class="caption" data-slot="s3_caption">
+          Supporting sentence. Second sentence with <strong>key phrase</strong> context.<br>
+          Third sentence optional.
+        </p>
+        <!-- EDIT: delete source if not needed -->
+        <span class="source" data-slot="s3_source">Source: Publication, Date</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 4 · INSIGHT ════════════════════════════════════════
+       EDIT: eyebrow, headline (2–3 lines, use .ac for orange),
+             body text, optional source                             -->
+  <div class="slide" id="s4">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: eyebrow label -->
+        <span class="eyebrow" data-slot="s4_eyebrow">EYEBROW LABEL</span>
+        <span class="brand" data-slot="s4_date">DATE</span>
+      </div>
+
+      <!-- EDIT: headline. Add class="ac" to a div for orange accent line. -->
+      <div class="headline">
+        <div data-slot="s4_headline_line1">HEADLINE</div>
+        <div class="ac" data-slot="s4_headline_accent">ACCENT LINE</div>
+        <div data-slot="s4_headline_line3">LINE THREE</div>
+      </div>
+
+      <div>
+        <!-- EDIT: 3–4 sentence body -->
+        <p class="body-text" data-slot="s4_body">
+          First sentence sets up the insight.<br>
+          Second sentence provides evidence or data.<br>
+          Third sentence lands the memorable take.
+        </p>
+        <span class="source" data-slot="s4_source">Source: Publication, Date</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 5 · PULL QUOTE ═════════════════════════════════════
+       EDIT: top brand label, quote text (≤ 20 words), attribution  -->
+  <div class="slide" id="s5">
+    <div class="si">
+
+      <div class="top">
+        <div class="top-left">
+          <span class="star">✳</span>
+          <!-- EDIT: context label -->
+          <span class="brand" data-slot="s5_context">CONTEXT / SECTION</span>
+        </div>
+        <span class="brand" data-slot="s5_date">DATE</span>
+      </div>
+
+      <div class="quote-block">
+        <!-- EDIT: large italic quote -->
+        <p class="quote-text" data-slot="s5_quote">
+          "Your pull quote sits here in large Lora italic,
+          demanding attention on its own line."
+        </p>
+        <!-- EDIT: attribution -->
+        <span class="attribution" data-slot="s5_attribution">— NAME / SOURCE</span>
+      </div>
+
+      <div class="bottom">
+        <span></span>
+        <div class="circle-btn" style="color:var(--accent);border-color:var(--accent);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 6 · THREE POINTS ═══════════════════════════════════
+       EDIT: eyebrow, headline (2 lines), 3 point items             -->
+  <div class="slide" id="s6">
+    <div class="si">
+
+      <div class="top">
+        <!-- EDIT: eyebrow label -->
+        <span class="eyebrow" data-slot="s6_eyebrow">EYEBROW LABEL</span>
+        <span class="brand" data-slot="s6_date">DATE</span>
+      </div>
+
+      <!-- EDIT: 2-line headline -->
+      <div class="headline" style="font-size:110px;">
+        <div data-slot="s6_headline_line1">HEADLINE</div>
+        <div data-slot="s6_headline_line2">LINE TWO</div>
+      </div>
+
+      <!-- EDIT: 3 points. Wrap key word in <strong>. -->
+      <div class="points">
+        <div class="point-item">
+          <span class="point-num">01</span>
+          <span class="point-text" data-slot="s6_point1">First point — <strong>short</strong>, punchy, actionable.</span>
+        </div>
+        <div class="point-item">
+          <span class="point-num">02</span>
+          <span class="point-text" data-slot="s6_point2">Second point — adds context or evidence.</span>
+        </div>
+        <div class="point-item">
+          <span class="point-num">03</span>
+          <span class="point-text" data-slot="s6_point3">Third point — the counter-intuitive or memorable one.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 7 · OPINION ════════════════════════════════════════
+       EDIT: eyebrow, headline (2–3 lines, use .ac for orange),
+             opinion quote paragraph                                 -->
+  <div class="slide" id="s7">
+    <div class="si">
+
+      <div class="top">
+        <div class="top-left">
+          <span class="star">✳</span>
+          <!-- EDIT: e.g. "[MY TAKE]" -->
+          <span class="brand" data-slot="s7_take_label">MY TAKE</span>
+        </div>
+        <!-- EDIT: your name -->
+        <span class="brand" data-slot="s7_author">YOUR NAME</span>
+      </div>
+
+      <!-- EDIT: opinion framing headline -->
+      <div class="headline">
+        <div data-slot="s7_headline_line1">THIS WAS</div>
+        <div class="ac" data-slot="s7_headline_accent">ALWAYS</div>
+        <div data-slot="s7_headline_line3">COMING.</div>
+      </div>
+
+      <!-- EDIT: the opinion — 2–3 sentences in first person, Lora italic -->
+      <p class="opinion" data-slot="s7_opinion">
+        "Your honest take in two or three sentences. Make it a perspective
+        only you could share — something people will screenshot."
+      </p>
+
+    </div>
+  </div>
+
+
+  <!-- ══ SLIDE 8 · CTA ════════════════════════════════════════════
+       EDIT: brand/section label, author name, headline (3 lines),
+             cta-text body (wrap key phrase in <strong>)            -->
+  <div class="slide" id="s8">
+    <div class="si">
+
+      <div class="top">
+        <div class="top-left">
+          <span class="star">✳</span>
+          <!-- EDIT: section context -->
+          <span class="brand" data-slot="s8_section">SECTION</span>
+        </div>
+        <!-- EDIT: your name -->
+        <span class="brand" data-slot="s8_author">YOUR NAME</span>
+      </div>
+
+      <!-- EDIT: CTA headline, 2–3 lines -->
+      <div class="headline" style="font-size:148px;">
+        <div data-slot="s8_cta_line1">FOLLOW</div>
+        <div data-slot="s8_cta_line2">FOR MORE</div>
+        <div class="ac" data-slot="s8_cta_line3">LIKE THIS.</div>
+      </div>
+
+      <!-- EDIT: CTA body text. Wrap key phrase in <strong> for orange. -->
+      <div class="cta-block">
+        <p class="cta-text" data-slot="s8_cta_body">
+          If you'd rather read <strong>real insight</strong> than hype —<br>
+          follow. I post weekly.
+        </p>
+        <div class="circle-btn" style="color:var(--accent);border-color:var(--accent);">
+          <svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17H26M18 9L26 17L18 25"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /viewer -->
+
+<div class="controls">
+  <button class="nav-btn" id="prev" aria-label="Previous">
+    <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4L6 8.5L11 13"/></svg>
+  </button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">1 / 8</span>
+  <button class="nav-btn" id="next" aria-label="Next">
+    <svg viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4L11 8.5L6 13"/></svg>
+  </button>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const dotsEl = document.getElementById('dots');
+  const counter = document.getElementById('counter');
+  let cur = 0;
+  const N = slides.length;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+
+  function go(idx) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = ((idx % N) + N) % N;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    counter.textContent = (cur + 1) + ' / ' + N;
+  }
+
+  document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+  document.getElementById('next').addEventListener('click', () => go(cur + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  go(cur - 1);
+    if (e.key === 'ArrowRight') go(cur + 1);
+  });
+
+  let tx = 0;
+  const vw = document.getElementById('viewer');
+  vw.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  vw.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) go(dx < 0 ? cur + 1 : cur - 1);
+  }, { passive: true });
+</script>
+
+</body>
+</html>

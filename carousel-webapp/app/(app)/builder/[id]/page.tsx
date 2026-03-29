@@ -1,0 +1,196 @@
+'use client'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { use } from 'react'
+import { useCarousel } from '@/hooks/useCarousel'
+import { useTemplateSchema } from '@/hooks/useTemplateSchema'
+import { useExport } from '@/hooks/useExport'
+import { buildSrcdoc, isSingleSlideTemplate } from '@/lib/template-engine'
+import { SlidePreview, type SlidePreviewHandle } from '@/components/editor/SlidePreview'
+import { PropertyPanel } from '@/components/editor/PropertyPanel'
+import { SlideThumbnails } from '@/components/editor/SlideThumbnails'
+import { TemplatePicker } from '@/components/templates/TemplatePicker'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import type { SlotDefinition, Template } from '@/types/template'
+import { updateCarousel } from '@/lib/pocketbase'
+import { BrandPrompt } from '@/components/BrandPrompt'
+import { useBrandProfile } from '@/hooks/useBrandProfile'
+
+const CANVAS_WIDTH = 1080
+const CANVAS_HEIGHT = 1350
+
+// Typed accessor for the window-level capture-resolve bridge used by useExport.
+interface WindowWithCapture extends Window {
+  __captureResolve: ((dataUrl: string | null) => void) | null
+}
+function getCaptureWindow(): WindowWithCapture {
+  return window as unknown as WindowWithCapture
+}
+export default function BuilderPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const { carousel, isLoading, updateSlot, updateGlobalSlot, setCarousel } = useCarousel(id)
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0)
+  const [activeSlot, setActiveSlot] = useState<SlotDefinition | null>(null)
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false)
+  const previewRef = useRef<SlidePreviewHandle>(null)
+  const hasMountedRef = useRef(false)
+  const templateId = carousel?.templateId ?? ''
+  const { template, schema, templateHtml } = useTemplateSchema(templateId)
+
+  const { isExporting, progress, exportZip } = useExport(
+    carousel?.slideCount ?? 0,
+    carousel?.title ?? ''
+  )
+  const { isFilled } = useBrandProfile()
+  const [showBrandPrompt, setShowBrandPrompt] = useState(false)
+
+  // Fit preview within a safe display area
+  const previewScale = Math.min(680 / CANVAS_HEIGHT, 560 / CANVAS_WIDTH)
+
+  useEffect(() => {
+    getCaptureWindow().__captureResolve = null
+  }, [])
+
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      return
+    }
+    // For multi-slide templates the bridge handles the switch;
+    // for single-slide templates the srcdoc memo rebuilds automatically.
+    if (templateHtml && !isSingleSlideTemplate(templateHtml)) {
+      previewRef.current?.switchSlide(activeSlideIndex)
+    }
+  }, [activeSlideIndex, templateHtml])
+
+  const handleSlotClick = useCallback(({ slotId }: { slotId: string; currentValue: string }) => {
+    if (!schema) return
+    const slotDef = schema.slots.find(s => s.id === slotId) ?? null
+    setActiveSlot(slotDef)
+  }, [schema])
+
+  const handleCaptureResult = useCallback((dataUrl: string | null) => {
+    const captureWindow = getCaptureWindow()
+    if (captureWindow.__captureResolve) {
+      captureWindow.__captureResolve(dataUrl)
+    }
+  }, [])
+
+  const handlePropertyChange = useCallback((value: string) => {
+    if (!activeSlot || !carousel) return
+    if (activeSlot.slide === 'all') {
+      updateGlobalSlot(activeSlot.id, value)
+    } else {
+      updateSlot(activeSlideIndex, activeSlot.id, value)
+    }
+    previewRef.current?.sendUpdate(activeSlot.id, value)
+  }, [activeSlot, carousel, activeSlideIndex, updateSlot, updateGlobalSlot])
+
+  async function handleSelectTemplate(t: Template) {
+    if (!carousel) return
+    const updated = await updateCarousel(carousel.id, { ...carousel, templateId: t.id })
+    setCarousel(updated)
+    setShowTemplatePicker(false)
+  }
+
+  async function handleExport(): Promise<void> {
+    const singleSlide = templateHtml ? isSingleSlideTemplate(templateHtml) : false
+    await exportZip(previewRef, async (index) => {
+      if (singleSlide) {
+        // For single-slide templates, update active index so the srcdoc memo rebuilds
+        setActiveSlideIndex(index)
+        await new Promise(r => setTimeout(r, 600))
+      } else {
+        previewRef.current?.switchSlide(index)
+        await new Promise(r => setTimeout(r, 150))
+      }
+    })
+    const dismissed = localStorage.getItem('brand_prompt_dismissed') === 'true'
+    if (!isFilled && !dismissed) {
+      setShowBrandPrompt(true)
+    }
+  }
+
+  const srcdoc = useMemo(() => {
+    if (!templateHtml || !schema || !carousel || carousel.slides.length === 0) {
+      return `<html><body style="background:#1a1a1a;display:flex;align-items:center;justify-content:center;height:100vh;color:#666;font-family:sans-serif"><p>Select a template to start</p></body></html>`
+    }
+    if (isSingleSlideTemplate(templateHtml)) {
+      // For single-slide templates, rebuild the srcdoc for the current slide so
+      // each slide gets its own content via the slot values.
+      const currentSlide = carousel.slides[activeSlideIndex] ?? carousel.slides[0]
+      return buildSrcdoc(templateHtml, schema, [currentSlide], 0,
+        { canvasWidth: CANVAS_WIDTH, canvasHeight: CANVAS_HEIGHT })
+    }
+    return buildSrcdoc(templateHtml, schema, carousel.slides, activeSlideIndex,
+      { canvasWidth: CANVAS_WIDTH, canvasHeight: CANVAS_HEIGHT })
+  }, [templateHtml, schema, carousel, activeSlideIndex])
+
+  if (isLoading || !carousel) {
+    return (
+      <div className="p-8 space-y-4">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-[675px] w-[540px]" />
+      </div>
+    )
+  }
+
+  const currentSlide = carousel.slides[activeSlideIndex]
+  const currentSlotValue = activeSlot && currentSlide
+    ? currentSlide.slots[activeSlot.id] ?? activeSlot.default ?? ''
+    : ''
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <div className="w-56 border-r border-zinc-800 p-4 flex flex-col gap-6 overflow-auto">
+        <SlideThumbnails
+          slideCount={carousel.slideCount}
+          activeIndex={activeSlideIndex}
+          onSelect={setActiveSlideIndex}
+        />
+        <Button variant="outline" size="sm" onClick={() => setShowTemplatePicker(true)}>
+          Change Template
+        </Button>
+      </div>
+
+      <div className="flex-1 flex flex-col items-center justify-center bg-zinc-900 gap-6 p-8">
+        <SlidePreview
+          ref={previewRef}
+          srcdoc={srcdoc}
+          canvasWidth={CANVAS_WIDTH}
+          canvasHeight={CANVAS_HEIGHT}
+          scale={previewScale}
+          onSlotClick={handleSlotClick}
+          onCaptureResult={handleCaptureResult}
+        />
+        <Button
+          onClick={handleExport}
+          disabled={isExporting || !template}
+          className="w-48"
+        >
+          {isExporting ? `Exporting… ${progress}%` : 'Export ZIP'}
+        </Button>
+      </div>
+
+      <PropertyPanel
+        activeSlot={activeSlot}
+        currentValue={currentSlotValue}
+        onChange={handlePropertyChange}
+      />
+
+      {showTemplatePicker && (
+        <div className="absolute inset-0 bg-zinc-950/90 z-50 flex flex-col p-8 overflow-auto">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold">Choose a Template</h2>
+            <Button variant="ghost" onClick={() => setShowTemplatePicker(false)}>&#x2715; Cancel</Button>
+          </div>
+          <TemplatePicker onSelect={handleSelectTemplate} selectedId={templateId} />
+        </div>
+      )}
+
+      {showBrandPrompt && (
+        <BrandPrompt onDismiss={() => setShowBrandPrompt(false)} />
+      )}
+    </div>
+  )
+}
