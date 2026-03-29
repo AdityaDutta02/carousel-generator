@@ -87,7 +87,8 @@ export function buildSlotFillPrompt(
       '- date / time / when → use "Today"',
       '- category / tag / topic / label / genre → derive a 1-3 word category from the carousel topic (e.g. "AI & Tech", "Finance", "Health")',
       '- source / attribution / via → use "Source" or derive from context',
-      '- numbered list slots (e.g. "CIRCLED LINE ONE", "Point 1", "Step 2") → split the body\'s list items across these slots in order; if the body has no list, break the body sentence into short phrases',
+      '- numbered list slots (e.g. "CIRCLED LINE ONE", "CIRCLED LINE TWO", "Point 1", "Step 2") → CRITICAL: these form a split multi-part headline. Treat them as one headline broken into single words or 2-word phrases across the numbered slots in order. Each numbered slot must contain ONLY 1-3 words — never a full sentence. E.g. if headline is "AI Changes Video" split into: line1="AI", line2="CHANGES", line3="VIDEO". If there are more slots than words, use a relevant single word from the body for extras.',
+      '- italic / caption / label / sub / note → use a short punchy phrase (3-7 words) from the body or cta',
       '- any remaining slot → use the most contextually appropriate short phrase from the copy',
     ].join('\n'),
   ]

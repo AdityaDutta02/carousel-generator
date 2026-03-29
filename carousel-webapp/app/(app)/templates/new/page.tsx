@@ -52,16 +52,36 @@ function SidePanelTabs({ activeTab, onTabChange, editContent, schemaContent }: S
   )
 }
 
+function inferMaxChars(id: string): number {
+  const lower = id.toLowerCase()
+  // Single-word split-headline slots (circled line N, step N, point N, line N)
+  if (/(?:circled|line|step|point)\s*(?:one|two|three|four|five|six|\d)/.test(lower)) return 15
+  // Headline / hook — short punchy phrase
+  if (/headline|hook|title/.test(lower)) return 40
+  // Stats / numbers
+  if (/stat|number|figure|count|metric/.test(lower)) return 10
+  // Category / label / tag / date — very short
+  if (/categor|label|tag|date|brand|handle|source/.test(lower)) return 20
+  // CTA / action
+  if (/cta|action|follow|button/.test(lower)) return 30
+  // Body / description — longest
+  if (/body|text|description|content|caption|note|quote|pull/.test(lower)) return 120
+  return 80
+}
+
 function autoDetectSchema(html: string): SchemaJson {
   const ids = [...new Set([...html.matchAll(/data-slot="([^"]+)"/g)].map(m => m[1]))]
-  const slots: SlotDefinition[] = ids.map(id => ({
-    id,
-    slide: 1,
-    selector: `[data-slot='${id}']`,
-    type: 'text',
-    label: id.replace(/_/g, ' ').replace(/^s\d+ /, ''),
-    maxChars: 80,
-  }))
+  const slots: SlotDefinition[] = ids.map(id => {
+    const label = id.replace(/_/g, ' ').replace(/^s\d+ /, '')
+    return {
+      id,
+      slide: 1,
+      selector: `[data-slot='${id}']`,
+      type: 'text',
+      label,
+      maxChars: inferMaxChars(id),
+    }
+  })
   return { version: 1, slots }
 }
 

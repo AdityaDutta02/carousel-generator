@@ -21,6 +21,7 @@ export default function GeneratePage() {
   const [copy, setCopy] = useState<GeneratedCopy | null>(null)
   const [platform, setPlatform] = useState<Platform>('linkedin')
   const [isCreating, setIsCreating] = useState(false)
+  const [createError, setCreateError] = useState<string | null>(null)
 
   async function handleCopyApproved(approvedCopy: GeneratedCopy, approvedPlatform: Platform) {
     setCopy(approvedCopy)
@@ -35,6 +36,7 @@ export default function GeneratePage() {
   async function handleTemplateSelected(template: Template) {
     if (!copy || !user) return
     setIsCreating(true)
+    setCreateError(null)
     try {
       const allSlots = template.schemaJson?.slots ?? []
       const slideCount = copy.slides.length
@@ -78,7 +80,8 @@ export default function GeneratePage() {
       })
       router.push(`/builder/${carousel.id}`)
     } catch (err) {
-      console.error('[handleTemplateSelected] failed', err)
+      const msg = err instanceof Error ? err.message : 'Failed to create carousel'
+      setCreateError(msg)
     } finally {
       setIsCreating(false)
     }
@@ -114,6 +117,11 @@ export default function GeneratePage() {
                 ← Back to script
               </Button>
             </div>
+            {createError && (
+              <div className="mb-4 rounded-lg bg-red-900/30 border border-red-800 px-4 py-3 text-sm text-red-300">
+                {createError}
+              </div>
+            )}
             {isCreating ? (
               <div className="flex flex-col items-center justify-center gap-4 py-24">
                 <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
