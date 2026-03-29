@@ -144,7 +144,7 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
             <span className="text-sm text-zinc-400 whitespace-nowrap">Slides: {slideCount}</span>
             <Slider
               min={3}
-              max={15}
+              max={8}
               step={1}
               defaultValue={slideCount}
               onValueCommitted={(v) => setSlideCount(Array.isArray(v) ? v[0] : v)}

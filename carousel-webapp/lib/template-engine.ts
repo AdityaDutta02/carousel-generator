@@ -262,6 +262,10 @@ function injectCanvasSize(html: string, width: number, height: number): string {
   // NOTE: JS in this template literal runs in the browser iframe, not Node.js.
   const scriptOverride = `<script id="__canvas-override-script">document.addEventListener('DOMContentLoaded', function() {
   var w = ${width}, h = ${height};
+  // Remove body-level text nodes that push slide content down
+  Array.from(document.body.childNodes).forEach(function(n) {
+    if (n.nodeType === 3) n.textContent = '';
+  });
   document.querySelectorAll('.viewer').forEach(function(el) {
     el.style.width = w + 'px';
     el.style.height = h + 'px';

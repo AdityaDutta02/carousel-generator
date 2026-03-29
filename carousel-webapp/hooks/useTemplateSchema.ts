@@ -48,7 +48,11 @@ export function useTemplateSchema(templateId: string) {
           slideCountDefault: (record.slide_count_default as number) || 5,
         }
         setState(prev => ({ ...prev, id: templateId, template: t, schema: t.schemaJson }))
-        return fetch(`/api/template/${templateId}`)
+        return fetch(`/api/template/${templateId}`, {
+          headers: pb.authStore.token
+            ? { Authorization: `Bearer ${pb.authStore.token}` }
+            : {},
+        })
       })
       .then(res => (res?.ok ? res.text() : undefined))
       .then(html => {
