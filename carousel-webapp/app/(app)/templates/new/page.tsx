@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,10 +9,22 @@ import { PngUploader } from '@/components/templates/PngUploader'
 import { SchemaEditor } from '@/components/editor/SchemaEditor'
 import { PropertyPanel } from '@/components/editor/PropertyPanel'
 import { SlidePreview, type SlidePreviewHandle } from '@/components/editor/SlidePreview'
-import { buildSrcdoc } from '@/lib/template-engine'
+import { buildSrcdoc, isSingleSlideTemplate } from '@/lib/template-engine'
 import { pb } from '@/lib/pocketbase'
 import type { SchemaJson, SlotDefinition } from '@/types/template'
 import type { Slide } from '@/types/carousel'
+
+const PREVIEW_SLIDE_COUNT = 8
+
+function generateDummySlides(schema: SchemaJson, count: number): Slide[] {
+  return Array.from({ length: count }, (_, i) => {
+    const slots: Record<string, string> = {}
+    for (const slot of schema.slots) {
+      slots[slot.id] = slot.default ?? `${slot.label} ${i + 1}`
+    }
+    return { index: i, slots }
+  })
+}
 
 type Step = 'upload' | 'generating' | 'editing'
 type PanelTab = 'edit' | 'schema'
@@ -144,10 +156,10 @@ export default function NewTemplatePage() {
         throw new Error(json.error)
       }
       const { html } = await res.json() as { html: string }
-      const slideCount = [...html.matchAll(/class="slide(?:\s|")/g)].length || 1
+      const detectedSchema = autoDetectSchema(html)
       setTemplateHtml(html)
-      setSchema(autoDetectSchema(html))
-      setSlides(Array.from({ length: slideCount }, (_, i) => ({ index: i, slots: {} })))
+      setSchema(detectedSchema)
+      setSlides(generateDummySlides(detectedSchema, PREVIEW_SLIDE_COUNT))
       setPreviewSlideIndex(0)
       setStep('editing')
     } catch (err) {
@@ -167,10 +179,14 @@ export default function NewTemplatePage() {
     (value: string) => {
       if (!activeSlot) return
       const slotId = activeSlot.id
-      setSlides(prev => [{ ...prev[0], slots: { ...prev[0].slots, [slotId]: value } }])
+      setSlides(prev => prev.map((s, i) =>
+        i === previewSlideIndex
+          ? { ...s, slots: { ...s.slots, [slotId]: value } }
+          : s
+      ))
       previewRef.current?.sendUpdate(slotId, value)
     },
-    [activeSlot]
+    [activeSlot, previewSlideIndex]
   )
 
   const handleSave = async () => {
@@ -192,7 +208,7 @@ export default function NewTemplatePage() {
       formData.append('schema_json', JSON.stringify(schema))
       formData.append('canvas_width', '1080')
       formData.append('canvas_height', '1350')
-      formData.append('slide_count_default', '5')
+      formData.append('slide_count_default', String(PREVIEW_SLIDE_COUNT))
 
       const slug = templateName.trim().replace(/\s+/g, '-').toLowerCase()
       const htmlBlob = new Blob([templateHtml], { type: 'text/html' })
@@ -219,7 +235,16 @@ export default function NewTemplatePage() {
     }
   }
 
-  const srcdoc = templateHtml ? buildSrcdoc(templateHtml, schema, slides, previewSlideIndex) : ''
+  const singleSlide = templateHtml ? isSingleSlideTemplate(templateHtml) : false
+
+  const srcdoc = useMemo(() => {
+    if (!templateHtml) return ''
+    if (singleSlide) {
+      const currentSlide = slides[previewSlideIndex] ?? slides[0]
+      return buildSrcdoc(templateHtml, schema, [currentSlide], 0, { canvasWidth: 1080, canvasHeight: 1350 })
+    }
+    return buildSrcdoc(templateHtml, schema, slides, previewSlideIndex, { canvasWidth: 1080, canvasHeight: 1350 })
+  }, [templateHtml, schema, slides, previewSlideIndex, singleSlide])
 
   return (
     <div className="flex flex-col h-screen bg-zinc-950 text-white">
@@ -308,11 +333,7 @@ export default function NewTemplatePage() {
                 <button
                   type="button"
                   disabled={previewSlideIndex === 0}
-                  onClick={() => {
-                    const next = previewSlideIndex - 1
-                    setPreviewSlideIndex(next)
-                    previewRef.current?.switchSlide(next)
-                  }}
+                  onClick={() => setPreviewSlideIndex(i => i - 1)}
                   className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   ←
@@ -321,11 +342,7 @@ export default function NewTemplatePage() {
                 <button
                   type="button"
                   disabled={previewSlideIndex === slides.length - 1}
-                  onClick={() => {
-                    const next = previewSlideIndex + 1
-                    setPreviewSlideIndex(next)
-                    previewRef.current?.switchSlide(next)
-                  }}
+                  onClick={() => setPreviewSlideIndex(i => i + 1)}
                   className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   →
@@ -343,7 +360,7 @@ export default function NewTemplatePage() {
                   activeSlot={activeSlot}
                   currentValue={
                     activeSlot
-                      ? (slides[0].slots[activeSlot.id] ?? activeSlot.default ?? '')
+                      ? (slides[previewSlideIndex]?.slots[activeSlot.id] ?? activeSlot.default ?? '')
                       : ''
                   }
                   onChange={handleSlotChange}

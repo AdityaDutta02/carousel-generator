@@ -218,6 +218,14 @@ export function injectBridgeScript(html: string, schema: SchemaJson): string {
     if (e.data.type === 'CAPTURE') {
       var slideEl = document.querySelector('.slide.active') || document.querySelector('.slide');
       if (!slideEl) { window.parent.postMessage({ type: 'CAPTURE_RESULT', dataUrl: null }, '*'); return; }
+      // Hide non-active slides so stacked absolute-positioned slides don't bleed into the capture
+      var hiddenSlides = [];
+      document.querySelectorAll('.slide').forEach(function(s) {
+        if (s !== slideEl) {
+          hiddenSlides.push({ el: s, prevDisplay: s.style.display });
+          s.style.display = 'none';
+        }
+      });
       var origTransform = slideEl.style.transform;
       var origTransformOrigin = slideEl.style.transformOrigin;
       slideEl.style.transform = 'none';
@@ -230,10 +238,12 @@ export function injectBridgeScript(html: string, schema: SchemaJson): string {
         .then(function(dataUrl) {
           slideEl.style.transform = origTransform;
           slideEl.style.transformOrigin = origTransformOrigin;
+          hiddenSlides.forEach(function(item) { item.el.style.display = item.prevDisplay; });
           window.parent.postMessage({ type: 'CAPTURE_RESULT', dataUrl: dataUrl }, '*');
         })
         .catch(function(err) {
           console.error('Capture failed', err);
+          hiddenSlides.forEach(function(item) { item.el.style.display = item.prevDisplay; });
           window.parent.postMessage({ type: 'CAPTURE_RESULT', dataUrl: null }, '*');
         });
     }
@@ -271,7 +281,7 @@ function injectCanvasSize(html: string, width: number, height: number): string {
   // forces inline styles via JS for properties that CSS can't beat (inline style attributes).
   // .slide gets position:absolute so body-level whitespace/text nodes can't push it down.
   // The <script> defers to DOMContentLoaded so .slide elements exist first.
-  const styleOverride = `<style id="__canvas-override">\n:root{--sw:${width}px;--sh:${height}px;--scale:1}\nhtml,body{margin:0!important;padding:0!important;width:${width}px!important;height:${height}px!important;overflow:hidden!important;position:relative!important}\n.viewer{width:${width}px!important;height:${height}px!important;border-radius:0!important;box-shadow:none!important;position:relative!important}\n.slide{position:absolute!important;top:0!important;left:0!important;width:${width}px!important;height:${height}px!important;transform:none!important;transform-origin:top left!important}\n</style>`
+  const styleOverride = `<style id="__canvas-override">\n:root{--sw:${width}px;--sh:${height}px;--scale:1}\nhtml,body{margin:0!important;padding:0!important;width:${width}px!important;height:${height}px!important;overflow:hidden!important;position:relative!important}\n.viewer{width:${width}px!important;height:${height}px!important;border-radius:0!important;box-shadow:none!important;position:relative!important;transform:none!important}\n.slide{position:absolute!important;top:0!important;left:0!important;width:${width}px!important;height:${height}px!important;transform:none!important;transform-origin:top left!important;overflow:hidden!important}\n</style>`
   // NOTE: JS in this template literal runs in the browser iframe, not Node.js.
   const scriptOverride = `<script id="__canvas-override-script">document.addEventListener('DOMContentLoaded', function() {
   var w = ${width}, h = ${height};
@@ -288,6 +298,7 @@ function injectCanvasSize(html: string, width: number, height: number): string {
     el.style.borderRadius = '0';
     el.style.boxShadow = 'none';
     el.style.position = 'relative';
+    el.style.transform = 'none';
   });
   document.querySelectorAll('.slide').forEach(function(el) {
     el.style.position = 'absolute';
