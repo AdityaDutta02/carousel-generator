@@ -75,4 +75,23 @@ describe('buildTemplateGenSystemPrompt', () => {
     expect(prompt).toContain('WORKED EXAMPLE')
     expect(prompt).toMatch(/data-slot="s1_headline"/)
   })
+
+  it('requires 8 distinct slide layouts', () => {
+    const prompt = buildTemplateGenSystemPrompt()
+    expect(prompt).toContain('Cover/Hook')
+    expect(prompt).toContain('Stat/Data')
+    expect(prompt).toContain('CTA/Ending')
+    expect(prompt).toContain('s8_cta')
+  })
+
+  it('forbids transform:scale on slides', () => {
+    const prompt = buildTemplateGenSystemPrompt()
+    expect(prompt).toContain('NO transform:scale')
+  })
+
+  it('requires .viewer container with position:absolute slides', () => {
+    const prompt = buildTemplateGenSystemPrompt()
+    expect(prompt).toContain('.viewer')
+    expect(prompt).toContain('position:absolute')
+  })
 })

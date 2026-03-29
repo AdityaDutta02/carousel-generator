@@ -145,7 +145,7 @@ export async function fillSlots(
 
 // ─── Template Generation (GOOD_MODEL only) ────────────────────────────────────
 
-const TEMPLATE_EXAMPLE = `<!DOCTYPE html>
+const MULTI_SLIDE_EXAMPLE = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -158,50 +158,48 @@ const TEMPLATE_EXAMPLE = `<!DOCTYPE html>
   --dark: #111110;
   --sw: 1080px;
   --sh: 1350px;
-  --scale: 0.5;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { width: var(--sw); height: var(--sh); overflow: hidden; }
+body { width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); }
+.viewer { position: relative; width: 1080px; height: 1350px; overflow: hidden; }
 .slide {
-  width: var(--sw);
-  height: var(--sh);
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
-  padding: 72px;
-  transform-origin: top left;
-  transform: scale(var(--scale));
+  position: absolute; top: 0; left: 0;
+  width: 1080px; height: 1350px;
+  display: none; flex-direction: column; padding: 72px;
 }
-.headline {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 130px;
-  font-weight: 900;
-  line-height: 0.95;
-  color: var(--dark);
-  text-transform: uppercase;
-}
-.body-text {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 32px;
-  color: var(--dark);
-  margin-top: 40px;
-}
-.brand {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-top: auto;
-}
+.slide.active { display: flex; }
+/* --- Slide 1: Cover --- */
+.s1-tag { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 600; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; }
+.s1-headline { font-family: 'Barlow Condensed', sans-serif; font-size: 140px; font-weight: 900; line-height: 0.92; color: var(--dark); text-transform: uppercase; margin-top: 32px; }
+.s1-brand { font-family: 'DM Sans', sans-serif; font-size: 24px; color: var(--accent); font-weight: 600; margin-top: auto; letter-spacing: 0.1em; text-transform: uppercase; }
+/* --- Slide 3: Stat --- */
+.s3-label { font-family: 'DM Sans', sans-serif; font-size: 28px; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
+.s3-stat { font-family: 'Barlow Condensed', sans-serif; font-size: 220px; font-weight: 900; color: var(--dark); line-height: 0.9; margin-top: 16px; }
+.s3-context { font-family: 'DM Sans', sans-serif; font-size: 34px; color: var(--dark); margin-top: 32px; max-width: 800px; }
+/* --- Slide 8: CTA --- */
+.s8-cta { font-family: 'Barlow Condensed', sans-serif; font-size: 120px; font-weight: 900; line-height: 0.92; color: var(--dark); text-transform: uppercase; margin-top: auto; }
+.s8-handle { font-family: 'DM Sans', sans-serif; font-size: 30px; color: var(--accent); font-weight: 600; margin-top: 48px; margin-bottom: auto; }
 </style>
 </head>
 <body>
-<div class="slide">
-  <h1 class="headline" data-slot="s1_headline" data-slot-size="headline">Most Investors Get This Wrong</h1>
-  <p class="body-text" data-slot="s1_body">And it costs them 30% returns every year.</p>
-  <p class="brand" data-slot="s1_brand">FinanceFirst</p>
+<div class="viewer">
+  <!-- SLIDE 1: Cover/Hook -->
+  <div class="slide active">
+    <span class="s1-tag" data-slot="s1_tag">Finance Tips</span>
+    <h1 class="s1-headline" data-slot="s1_headline">Most Investors Get This Wrong</h1>
+    <p class="s1-brand" data-slot="s1_brand">FinanceFirst</p>
+  </div>
+  <!-- SLIDE 3: Stat/Data (slides 2,4,5,6,7 follow same pattern — distinct layouts each) -->
+  <div class="slide">
+    <span class="s3-label" data-slot="s3_label">The Reality</span>
+    <p class="s3-stat" data-slot="s3_stat">73%</p>
+    <p class="s3-context" data-slot="s3_context">of retail investors underperform the index every single year</p>
+  </div>
+  <!-- SLIDE 8: CTA/Ending -->
+  <div class="slide">
+    <h2 class="s8-cta" data-slot="s8_cta">Follow For Daily Finance Tips</h2>
+    <p class="s8-handle" data-slot="s8_handle">@FinanceFirst</p>
+  </div>
 </div>
 </body>
 </html>`
@@ -210,26 +208,41 @@ export function buildTemplateGenSystemPrompt(): string {
   return `You are an expert HTML/CSS designer specialising in social media carousel slides.
 
 ## TASK
-Generate a single self-contained HTML template for a carousel slide based on the provided reference images.
+Generate a complete 8-slide carousel HTML file where EACH SLIDE has a DISTINCT visual layout and purpose. Match the style of the reference images closely.
+
+## SLIDE ROLES — generate one of each, in this order
+1. **Cover/Hook** (s1_*) — Bold oversized headline, brand name. Stops the scroll. Minimal text.
+2. **Problem** (s2_*) — Headline + body text describing the pain point or challenge.
+3. **Stat/Data** (s3_*) — Oversized number/statistic dominating the layout + brief context.
+4. **Solution** (s4_*) — Headline + actionable body text (the core insight).
+5. **Deep Dive** (s5_*) — Headline + longer body copy. Most text-heavy slide.
+6. **Quote** (s6_*) — Large pull quote filling the slide + attribution line.
+7. **Tips/List** (s7_*) — Headline + three separate tip slots (s7_tip1, s7_tip2, s7_tip3).
+8. **CTA/Ending** (s8_*) — Strong call to action + brand handle. Mirrors the cover energy.
 
 ## REQUIRED SPECIFICATIONS
-- Canvas: exactly 1080×1350px (set on both body and .slide element)
-- The .slide element must have: width: 1080px; height: 1350px; transform-origin: top left; transform: scale(0.5);
-- Minimum inner padding: 72px on all sides
-- Load fonts from Google Fonts only (no system fonts, no other CDNs)
-- All colours must be CSS custom properties on :root (e.g., --accent, --bg, --dark, --text)
-- All font sizes that should be editable must be CSS custom properties (e.g., --headline-size)
+- Canvas: exactly 1080×1350px (body, .viewer, and each .slide element)
+- 8 \`<div class="slide">\` elements inside \`<div class="viewer">\` — first has class \`slide active\`
+- **CRITICAL: NO transform:scale() anywhere** — the editor handles all scaling externally
+- CSS: \`.slide { display:none }\` / \`.slide.active { display:flex }\`
+- .viewer: \`position:relative; width:1080px; height:1350px; overflow:hidden\`
+- Each .slide: \`position:absolute; top:0; left:0; width:1080px; height:1350px\`
+- Minimum inner padding: 72px on all sides for each slide
+- Load fonts from Google Fonts only
+- All colours must be CSS custom properties on :root (--accent, --bg, --dark, etc.)
 
 ## SLOT ANNOTATION RULES
-Every element whose text content should be user-editable MUST have: data-slot="unique_id"
-Every element whose font size is controlled by a CSS var MUST also have: data-slot-size="slot_name"
+Every editable text element MUST have: \`data-slot="s{N}_{role}"\` where N is slide number 1–8
 
-Slot ID naming convention:
-- s1_headline — slide 1 main headline
-- s1_body — slide 1 body text
-- s1_brand — slide 1 brand/creator name
-- s1_stat — slide 1 stat or big number
-- s1_caption — slide 1 small caption
+Required slots per slide:
+- s1_headline, s1_brand — Cover
+- s2_headline, s2_body — Problem
+- s3_stat, s3_context — Stat
+- s4_headline, s4_body — Solution
+- s5_headline, s5_body — Deep Dive
+- s6_quote, s6_attribution — Quote
+- s7_headline, s7_tip1, s7_tip2, s7_tip3 — Tips
+- s8_cta, s8_handle — CTA
 
 ## CSS VARIABLE CONVENTIONS
 :root {
@@ -238,18 +251,17 @@ Slot ID naming convention:
   --dark: #111110;    /* primary text colour */
   --sw: 1080px;
   --sh: 1350px;
-  --scale: 0.5;
 }
 
-## WORKED EXAMPLE (replicate this structure exactly)
-${TEMPLATE_EXAMPLE}
+## WORKED EXAMPLE (3 of 8 slides shown — generate all 8 following the same pattern)
+${MULTI_SLIDE_EXAMPLE}
 
 ## OUTPUT RULES
 - Output HTML only — no explanation, no markdown fences, no code block wrappers
 - The entire response must be a valid complete HTML document starting with <!DOCTYPE html>
 - Must be self-contained (no external JS; Google Fonts only for external resources)
-- Must include at minimum: s1_headline and s1_body slots with data-slot attributes
-- Match the visual style, layout, colours, and typography of the reference images as closely as possible`
+- All 8 slides required with distinct layouts — do not reuse the same layout across slides
+- Match the visual style, layout, colours, and typography of the reference images`
 }
 
 export async function generateTemplate(

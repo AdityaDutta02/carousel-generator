@@ -84,10 +84,13 @@ function inferMaxChars(id: string): number {
 function autoDetectSchema(html: string): SchemaJson {
   const ids = [...new Set([...html.matchAll(/data-slot="([^"]+)"/g)].map(m => m[1]))]
   const slots: SlotDefinition[] = ids.map(id => {
-    const label = id.replace(/_/g, ' ').replace(/^s\d+ /, '')
+    // Extract slide number from slot ID prefix: "s3_headline" → slide 3, else default to 1
+    const slideMatch = id.match(/^s(\d+)_/)
+    const slide: number | 'all' = slideMatch ? Number(slideMatch[1]) : 1
+    const label = id.replace(/^s\d+_/, '').replace(/_/g, ' ')
     return {
       id,
-      slide: 1,
+      slide,
       selector: `[data-slot='${id}']`,
       type: 'text',
       label,
