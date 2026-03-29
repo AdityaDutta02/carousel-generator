@@ -10,6 +10,16 @@ export function getGlobalSlots(schema: SchemaJson): SlotDefinition[] {
   return schema.slots.filter(s => s.slide === 'all')
 }
 
+/**
+ * Returns true when the template HTML contains exactly one .slide element.
+ * Single-slide templates are reused for every carousel slide — the srcdoc
+ * must be rebuilt per active slide rather than using the SWITCH_SLIDE bridge.
+ */
+export function isSingleSlideTemplate(html: string): boolean {
+  const matches = html.match(/class="(slide(?:\s[^"]*)?)"/g) ?? []
+  return matches.length === 1
+}
+
 
 export function getSlideSlots(schema: SchemaJson, slideNumber: number): SlotDefinition[] {
   return schema.slots.filter(s => s.slide === slideNumber)
@@ -212,7 +222,11 @@ export function injectBridgeScript(html: string, schema: SchemaJson): string {
       var origTransformOrigin = slideEl.style.transformOrigin;
       slideEl.style.transform = 'none';
       slideEl.style.transformOrigin = 'top left';
-      domtoimage.toPng(slideEl, { width: slideEl.offsetWidth, height: slideEl.offsetHeight, style: { transform: 'none' } })
+      // Wait for web fonts to load before capturing so text renders correctly
+      Promise.resolve(document.fonts ? document.fonts.ready : Promise.resolve())
+        .then(function() {
+          return domtoimage.toPng(slideEl, { width: slideEl.offsetWidth, height: slideEl.offsetHeight, style: { transform: 'none' } });
+        })
         .then(function(dataUrl) {
           slideEl.style.transform = origTransform;
           slideEl.style.transformOrigin = origTransformOrigin;
@@ -253,12 +267,11 @@ export function injectBridgeScript(html: string, schema: SchemaJson): string {
  * Sets --scale to 1 because SlidePreview handles visual scaling via iframe transform.
  */
 function injectCanvasSize(html: string, width: number, height: number): string {
-  // Override canvas dimensions at the CSS cascade level. A companion <script> also forces
-  // inline styles via JS, because CSS rules can't beat inline style attributes — templates
-  // that hardcode `style="transform: scale(0.5)"` on .slide need the JS path to neutralise
-  // that transform. The <script> defers to DOMContentLoaded so .slide elements exist first.
-  // .viewer is expanded to full size because templates hardcode it at 540×675 for preview.
-  const styleOverride = `<style id="__canvas-override">\n:root{--sw:${width}px;--sh:${height}px;--scale:1}\nbody{width:${width}px!important;height:${height}px!important;overflow:hidden!important}\n.viewer{width:${width}px!important;height:${height}px!important;border-radius:0!important;box-shadow:none!important}\n.slide{width:${width}px!important;height:${height}px!important;transform:none!important;transform-origin:top left!important}\n</style>`
+  // Override canvas dimensions and layout at the CSS cascade level. A companion <script> also
+  // forces inline styles via JS for properties that CSS can't beat (inline style attributes).
+  // .slide gets position:absolute so body-level whitespace/text nodes can't push it down.
+  // The <script> defers to DOMContentLoaded so .slide elements exist first.
+  const styleOverride = `<style id="__canvas-override">\n:root{--sw:${width}px;--sh:${height}px;--scale:1}\nhtml,body{margin:0!important;padding:0!important;width:${width}px!important;height:${height}px!important;overflow:hidden!important;position:relative!important}\n.viewer{width:${width}px!important;height:${height}px!important;border-radius:0!important;box-shadow:none!important;position:relative!important}\n.slide{position:absolute!important;top:0!important;left:0!important;width:${width}px!important;height:${height}px!important;transform:none!important;transform-origin:top left!important}\n</style>`
   // NOTE: JS in this template literal runs in the browser iframe, not Node.js.
   const scriptOverride = `<script id="__canvas-override-script">document.addEventListener('DOMContentLoaded', function() {
   var w = ${width}, h = ${height};
@@ -266,13 +279,20 @@ function injectCanvasSize(html: string, width: number, height: number): string {
   Array.from(document.body.childNodes).forEach(function(n) {
     if (n.nodeType === 3) n.textContent = '';
   });
+  document.body.style.margin = '0';
+  document.body.style.padding = '0';
+  document.body.style.position = 'relative';
   document.querySelectorAll('.viewer').forEach(function(el) {
     el.style.width = w + 'px';
     el.style.height = h + 'px';
     el.style.borderRadius = '0';
     el.style.boxShadow = 'none';
+    el.style.position = 'relative';
   });
   document.querySelectorAll('.slide').forEach(function(el) {
+    el.style.position = 'absolute';
+    el.style.top = '0';
+    el.style.left = '0';
     el.style.transform = 'none';
     el.style.transformOrigin = 'top left';
     el.style.width = w + 'px';

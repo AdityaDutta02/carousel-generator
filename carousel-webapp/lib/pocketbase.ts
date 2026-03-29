@@ -150,6 +150,10 @@ export async function publishTemplate(templateId: string): Promise<Template> {
   }) as Promise<Template>
 }
 
+export async function deleteTemplate(templateId: string): Promise<void> {
+  await getPocketBase().collection('templates').delete(templateId)
+}
+
 /**
  * Verifies a PocketBase auth token server-side.
  * Returns the user record if valid, null otherwise.

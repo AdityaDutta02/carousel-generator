@@ -12,6 +12,10 @@ import type { GeneratedCopy, Platform } from '@/types/carousel'
 import type { Template } from '@/types/template'
 import { distributeFilledSlots } from '@/lib/slot-distribution'
 
+const SLIDE_COUNT = 8
+const CANVAS_WIDTH = 1080
+const CANVAS_HEIGHT = 1350
+
 type Step = 'chat' | 'review' | 'templates'
 
 export default function GeneratePage() {
@@ -39,42 +43,65 @@ export default function GeneratePage() {
     setCreateError(null)
     try {
       const allSlots = template.schemaJson?.slots ?? []
-      const slideCount = copy.slides.length
 
-      // Let the AI map all generated copy to the correct template slots.
-      // fillSlots returns a flat {slotId: value} map covering all slides.
-      let filled: Record<string, string> = {}
-      if (allSlots.length > 0) {
-        try {
-          const res = await fetch('/api/ai/fill-slots', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${pb.authStore.token}`,
-            },
-            body: JSON.stringify({ slots: allSlots, copy }),
+      // Detect single-slide templates: all per-slide slots use slide:1
+      const isSingleSlide = allSlots.length > 0 &&
+        allSlots.every(s => s.slide === 'all' || s.slide === 1)
+
+      let slideSlots: Record<string, string>[]
+
+      if (isSingleSlide) {
+        // For single-slide templates, run fillSlots once per carousel slide in
+        // parallel so each slide gets unique AI-mapped content.
+        slideSlots = await Promise.all(
+          Array.from({ length: SLIDE_COUNT }, (_, i) => {
+            const slideData = copy.slides[i] ?? copy.slides[copy.slides.length - 1]
+            const singleCopy = { hook: copy.hook, cta: copy.cta, slides: [slideData] }
+            return fetch('/api/ai/fill-slots', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${pb.authStore.token}`,
+              },
+              body: JSON.stringify({ slots: allSlots, copy: singleCopy }),
+            })
+              .then(res => res.ok ? (res.json() as Promise<Record<string, string>>) : {})
+              .catch(() => ({}))
           })
-          if (res.ok) {
-            filled = (await res.json()) as Record<string, string>
-          } else {
-            console.warn('[fill-slots] non-ok response', res.status)
+        )
+      } else {
+        // Multi-slide template: fill all slots at once then distribute
+        let filled: Record<string, string> = {}
+        if (allSlots.length > 0) {
+          try {
+            const res = await fetch('/api/ai/fill-slots', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${pb.authStore.token}`,
+              },
+              body: JSON.stringify({ slots: allSlots, copy }),
+            })
+            if (res.ok) {
+              filled = (await res.json()) as Record<string, string>
+            } else {
+              console.warn('[fill-slots] non-ok response', res.status)
+            }
+          } catch (err) {
+            console.warn('[fill-slots] failed, slides will use placeholder text', err)
           }
-        } catch (err) {
-          console.warn('[fill-slots] failed, slides will use placeholder text', err)
         }
+        slideSlots = distributeFilledSlots(filled, allSlots, SLIDE_COUNT)
       }
-
-      // Distribute flat slot map to per-slide records
-      const slideSlots = distributeFilledSlots(filled, allSlots, slideCount)
 
       const carousel = await createCarousel({
         owner: user.id,
         title: copy.hook,
         templateId: template.id,
         platform,
-        canvasWidth: template.canvasWidth,
-        canvasHeight: template.canvasHeight,
-        slideCount,
+        canvasWidth: CANVAS_WIDTH,
+        canvasHeight: CANVAS_HEIGHT,
+        slideCount: SLIDE_COUNT,
         slides: slideSlots.map((slots, i) => ({ index: i, slots })),
         status: 'draft',
       })

@@ -3,21 +3,24 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { pb, publishTemplate } from '@/lib/pocketbase'
+import { pb, publishTemplate, deleteTemplate } from '@/lib/pocketbase'
 import type { Template } from '@/types/template'
 
 interface TemplateCardProps {
   template: Template
   onSelect?: (template: Template) => void
   onPublished?: (updated: Template) => void
+  onDelete?: (id: string) => void
   isSelected?: boolean
 }
 
-export function TemplateCard({ template, onSelect, onPublished, isSelected }: TemplateCardProps) {
+export function TemplateCard({ template, onSelect, onPublished, onDelete, isSelected }: TemplateCardProps) {
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [htmlContent, setHtmlContent] = useState<string | null>(null)
   const isAdmin = (pb.authStore.model as { role?: string } | null)?.role === 'admin'
   const canPublish = isAdmin && template.scope === 'user'
+  const canDelete = template.scope === 'user'
 
   useEffect(() => {
     if (!template.htmlFileUrl || template.thumbnailUrl) return
@@ -38,6 +41,20 @@ export function TemplateCard({ template, onSelect, onPublished, isSelected }: Te
       alert(err instanceof Error ? err.message : 'Publish failed')
     } finally {
       setIsPublishing(false)
+    }
+  }
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!confirm(`Delete "${template.name}"? This cannot be undone.`)) return
+    setIsDeleting(true)
+    try {
+      await deleteTemplate(template.id)
+      onDelete?.(template.id)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Delete failed')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -97,8 +114,8 @@ export function TemplateCard({ template, onSelect, onPublished, isSelected }: Te
         </div>
       </div>
 
-      {canPublish && (
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+        {canPublish && (
           <Button
             size="sm"
             variant="outline"
@@ -108,8 +125,19 @@ export function TemplateCard({ template, onSelect, onPublished, isSelected }: Te
           >
             {isPublishing ? '…' : 'Publish'}
           </Button>
-        </div>
-      )}
+        )}
+        {canDelete && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-xs h-6 bg-zinc-900/90 border-zinc-600 hover:bg-red-600 hover:border-red-600 hover:text-white"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
+            {isDeleting ? '…' : '✕'}
+          </Button>
+        )}
+      </div>
     </div>
   )
 }

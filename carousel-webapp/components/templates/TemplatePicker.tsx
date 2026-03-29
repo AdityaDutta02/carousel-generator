@@ -53,6 +53,10 @@ export function TemplatePicker({ onSelect, selectedId }: TemplatePickerProps) {
     )
   }
 
+  function handleDelete(id: string) {
+    setTemplates(prev => prev.filter(t => t.id !== id))
+  }
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {templates.map(t => (
@@ -60,6 +64,7 @@ export function TemplatePicker({ onSelect, selectedId }: TemplatePickerProps) {
           key={t.id}
           template={t}
           onSelect={onSelect}
+          onDelete={handleDelete}
           isSelected={t.id === selectedId}
         />
       ))}

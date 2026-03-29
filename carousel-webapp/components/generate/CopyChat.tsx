@@ -3,7 +3,6 @@ import { useState, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Slider } from '@/components/ui/slider'
 import type { GeneratedCopy, Platform } from '@/types/carousel'
 import { useAuth } from '@/hooks/useAuth'
 import { getUserContext, getPocketBase } from '@/lib/pocketbase'
@@ -30,7 +29,6 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [platform, setPlatform] = useState<Platform>('linkedin')
-  const [slideCount, setSlideCount] = useState(5)
   const [isStreaming, setIsStreaming] = useState(false)
   const [pendingCopy, setPendingCopy] = useState<GeneratedCopy | null>(null)
   const [streamBuffer, setStreamBuffer] = useState('')
@@ -60,7 +58,7 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ messages: newMessages, userContext, slideCount }),
+        body: JSON.stringify({ messages: newMessages, userContext, slideCount: 8 }),
         signal: abortRef.current.signal,
       })
 
@@ -139,17 +137,6 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
                 {p.label}
               </Badge>
             ))}
-          </div>
-          <div className="flex gap-3 items-center">
-            <span className="text-sm text-zinc-400 whitespace-nowrap">Slides: {slideCount}</span>
-            <Slider
-              min={3}
-              max={8}
-              step={1}
-              defaultValue={slideCount}
-              onValueCommitted={(v) => setSlideCount(Array.isArray(v) ? v[0] : v)}
-              className="w-40"
-            />
           </div>
         </div>
       )}

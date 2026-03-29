@@ -4,19 +4,20 @@ import { use } from 'react'
 import { useCarousel } from '@/hooks/useCarousel'
 import { useTemplateSchema } from '@/hooks/useTemplateSchema'
 import { useExport } from '@/hooks/useExport'
-import { buildSrcdoc } from '@/lib/template-engine'
+import { buildSrcdoc, isSingleSlideTemplate } from '@/lib/template-engine'
 import { SlidePreview, type SlidePreviewHandle } from '@/components/editor/SlidePreview'
 import { PropertyPanel } from '@/components/editor/PropertyPanel'
 import { SlideThumbnails } from '@/components/editor/SlideThumbnails'
-import { CanvasSizePicker } from '@/components/editor/CanvasSizePicker'
 import { TemplatePicker } from '@/components/templates/TemplatePicker'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { SlotDefinition, Template } from '@/types/template'
-import { CANVAS_SIZES } from '@/types/carousel'
 import { updateCarousel } from '@/lib/pocketbase'
 import { BrandPrompt } from '@/components/BrandPrompt'
 import { useBrandProfile } from '@/hooks/useBrandProfile'
+
+const CANVAS_WIDTH = 1080
+const CANVAS_HEIGHT = 1350
 
 // Typed accessor for the window-level capture-resolve bridge used by useExport.
 interface WindowWithCapture extends Window {
@@ -31,13 +32,6 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
   const [activeSlideIndex, setActiveSlideIndex] = useState(0)
   const [activeSlot, setActiveSlot] = useState<SlotDefinition | null>(null)
   const [showTemplatePicker, setShowTemplatePicker] = useState(false)
-  const [canvasSizeKeyOverride, setCanvasSizeKeyOverride] = useState<string | null>(null)
-  const canvasSizeKey = canvasSizeKeyOverride
-    ?? (carousel
-      ? (Object.entries(CANVAS_SIZES).find(
-          ([, size]) => size.width === carousel.canvasWidth && size.height === carousel.canvasHeight
-        )?.[0] ?? 'instagram-portrait')
-      : 'instagram-portrait')
   const previewRef = useRef<SlidePreviewHandle>(null)
   const hasMountedRef = useRef(false)
   const templateId = carousel?.templateId ?? ''
@@ -50,6 +44,9 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
   const { isFilled } = useBrandProfile()
   const [showBrandPrompt, setShowBrandPrompt] = useState(false)
 
+  // Fit preview within a safe display area
+  const previewScale = Math.min(680 / CANVAS_HEIGHT, 560 / CANVAS_WIDTH)
+
   useEffect(() => {
     getCaptureWindow().__captureResolve = null
   }, [])
@@ -59,8 +56,12 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
       hasMountedRef.current = true
       return
     }
-    previewRef.current?.switchSlide(activeSlideIndex)
-  }, [activeSlideIndex])
+    // For multi-slide templates the bridge handles the switch;
+    // for single-slide templates the srcdoc memo rebuilds automatically.
+    if (templateHtml && !isSingleSlideTemplate(templateHtml)) {
+      previewRef.current?.switchSlide(activeSlideIndex)
+    }
+  }, [activeSlideIndex, templateHtml])
 
   const handleSlotClick = useCallback(({ slotId }: { slotId: string; currentValue: string }) => {
     if (!schema) return
@@ -93,9 +94,16 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
   }
 
   async function handleExport(): Promise<void> {
+    const singleSlide = templateHtml ? isSingleSlideTemplate(templateHtml) : false
     await exportZip(previewRef, async (index) => {
-      previewRef.current?.switchSlide(index)
-      await new Promise(r => setTimeout(r, 150))
+      if (singleSlide) {
+        // For single-slide templates, update active index so the srcdoc memo rebuilds
+        setActiveSlideIndex(index)
+        await new Promise(r => setTimeout(r, 600))
+      } else {
+        previewRef.current?.switchSlide(index)
+        await new Promise(r => setTimeout(r, 150))
+      }
     })
     const dismissed = localStorage.getItem('brand_prompt_dismissed') === 'true'
     if (!isFilled && !dismissed) {
@@ -103,17 +111,20 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
     }
   }
 
-  const activeCanvasWidth = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.width ?? 1080
-  const activeCanvasHeight = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.height ?? 1350
-  // Fit preview within a safe display area so tall canvases (Stories, TikTok) never crop
-  const previewScale = Math.min(680 / activeCanvasHeight, 560 / activeCanvasWidth)
   const srcdoc = useMemo(() => {
     if (!templateHtml || !schema || !carousel || carousel.slides.length === 0) {
       return `<html><body style="background:#1a1a1a;display:flex;align-items:center;justify-content:center;height:100vh;color:#666;font-family:sans-serif"><p>Select a template to start</p></body></html>`
     }
-    return buildSrcdoc(templateHtml, schema, carousel.slides, 0,
-      { canvasWidth: activeCanvasWidth, canvasHeight: activeCanvasHeight })
-  }, [templateHtml, schema, carousel, activeCanvasWidth, activeCanvasHeight])
+    if (isSingleSlideTemplate(templateHtml)) {
+      // For single-slide templates, rebuild the srcdoc for the current slide so
+      // each slide gets its own content via the slot values.
+      const currentSlide = carousel.slides[activeSlideIndex] ?? carousel.slides[0]
+      return buildSrcdoc(templateHtml, schema, [currentSlide], 0,
+        { canvasWidth: CANVAS_WIDTH, canvasHeight: CANVAS_HEIGHT })
+    }
+    return buildSrcdoc(templateHtml, schema, carousel.slides, activeSlideIndex,
+      { canvasWidth: CANVAS_WIDTH, canvasHeight: CANVAS_HEIGHT })
+  }, [templateHtml, schema, carousel, activeSlideIndex])
 
   if (isLoading || !carousel) {
     return (
@@ -137,7 +148,6 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
           activeIndex={activeSlideIndex}
           onSelect={setActiveSlideIndex}
         />
-        <CanvasSizePicker selected={canvasSizeKey} onSelect={setCanvasSizeKeyOverride} />
         <Button variant="outline" size="sm" onClick={() => setShowTemplatePicker(true)}>
           Change Template
         </Button>
@@ -147,8 +157,8 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
         <SlidePreview
           ref={previewRef}
           srcdoc={srcdoc}
-          canvasWidth={activeCanvasWidth}
-          canvasHeight={activeCanvasHeight}
+          canvasWidth={CANVAS_WIDTH}
+          canvasHeight={CANVAS_HEIGHT}
           scale={previewScale}
           onSlotClick={handleSlotClick}
           onCaptureResult={handleCaptureResult}
