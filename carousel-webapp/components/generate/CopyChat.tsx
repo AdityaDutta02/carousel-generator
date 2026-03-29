@@ -3,6 +3,7 @@ import { useState, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { Slider } from '@/components/ui/slider'
 import type { GeneratedCopy, Platform } from '@/types/carousel'
 import { useAuth } from '@/hooks/useAuth'
 import { getUserContext, getPocketBase } from '@/lib/pocketbase'
@@ -139,18 +140,16 @@ export function CopyChat({ onCopyApproved }: CopyChatProps) {
               </Badge>
             ))}
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <span className="text-sm text-zinc-400 self-center">Slides:</span>
-            {[3, 5, 7, 10].map(n => (
-              <Badge
-                key={n}
-                variant={slideCount === n ? 'default' : 'outline'}
-                className="cursor-pointer select-none"
-                onClick={() => setSlideCount(n)}
-              >
-                {n}
-              </Badge>
-            ))}
+          <div className="flex gap-3 items-center">
+            <span className="text-sm text-zinc-400 whitespace-nowrap">Slides: {slideCount}</span>
+            <Slider
+              min={3}
+              max={15}
+              step={1}
+              defaultValue={slideCount}
+              onValueCommitted={(v) => setSlideCount(Array.isArray(v) ? v[0] : v)}
+              className="w-40"
+            />
           </div>
         </div>
       )}

@@ -29,7 +29,7 @@ export function useTemplateSchema(templateId: string) {
     let cancelled = false
     const pb = getPocketBase()
     pb.collection('templates')
-      .getOne(templateId, { requestKey: `template-${templateId}` })
+      .getOne(templateId, { requestKey: null })
       .then(record => {
         if (cancelled) return undefined
         const t: Template = {

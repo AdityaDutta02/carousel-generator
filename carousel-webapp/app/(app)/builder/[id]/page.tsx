@@ -105,6 +105,8 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
 
   const activeCanvasWidth = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.width ?? 1080
   const activeCanvasHeight = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.height ?? 1350
+  // Fit preview within a safe display area so tall canvases (Stories, TikTok) never crop
+  const previewScale = Math.min(680 / activeCanvasHeight, 560 / activeCanvasWidth)
   const srcdoc = useMemo(() => {
     if (!templateHtml || !schema || !carousel || carousel.slides.length === 0) {
       return `<html><body style="background:#1a1a1a;display:flex;align-items:center;justify-content:center;height:100vh;color:#666;font-family:sans-serif"><p>Select a template to start</p></body></html>`
@@ -147,6 +149,7 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
           srcdoc={srcdoc}
           canvasWidth={activeCanvasWidth}
           canvasHeight={activeCanvasHeight}
+          scale={previewScale}
           onSlotClick={handleSlotClick}
           onCaptureResult={handleCaptureResult}
         />

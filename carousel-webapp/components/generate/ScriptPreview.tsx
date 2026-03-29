@@ -5,19 +5,12 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { Slider } from '@/components/ui/slider'
 import type { GeneratedCopy } from '@/types/carousel'
 
-// SlideCountConfig bundles value + setter so ScriptPreviewProps stays under the 5-prop limit.
-interface SlideCountConfig {
-  value: number
-  onChange: (n: number) => void
-}
 interface ScriptPreviewProps {
   copy: GeneratedCopy
   onCopyChange: (copy: GeneratedCopy) => void
   onConfirm: () => void
-  slideCount: SlideCountConfig
 }
 // SlideEditorProps drives the inline edit form rendered when a slide row is expanded.
 interface SlideEditorProps {
@@ -56,7 +49,7 @@ function SlideEditor({ slideIndex, headline, body, onFieldChange }: SlideEditorP
   )
 }
 
-export function ScriptPreview({ copy, onCopyChange, onConfirm, slideCount }: ScriptPreviewProps): ReactElement {
+export function ScriptPreview({ copy, onCopyChange, onConfirm }: ScriptPreviewProps): ReactElement {
   const [editingIdx, setEditingIdx] = useState<number | null>(null)
 
   function updateSlide(idx: number, field: 'headline' | 'body', value: string): void {
@@ -76,24 +69,6 @@ export function ScriptPreview({ copy, onCopyChange, onConfirm, slideCount }: Scr
         <p className="text-lg font-semibold text-white">{copy.hook}</p>
       </div>
       <Separator className="bg-zinc-800" />
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-zinc-400">Number of slides</p>
-          <span className="text-white font-semibold tabular-nums">{slideCount.value}</span>
-        </div>
-        <Slider
-          value={[slideCount.value]}
-          onValueChange={(values) => slideCount.onChange(values[0])}
-          min={3}
-          max={15}
-          step={1}
-          className="[&_[data-slot=slider-range]]:bg-orange-500 [&_[data-slot=slider-thumb]]:border-orange-500"
-        />
-        <div className="flex justify-between text-xs text-zinc-600">
-          <span>3</span>
-          <span>15</span>
-        </div>
-      </div>
       <div className="space-y-4">
         {copy.slides.map((slide, i) => (
           <div

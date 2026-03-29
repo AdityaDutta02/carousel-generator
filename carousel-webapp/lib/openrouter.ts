@@ -19,7 +19,7 @@ function getClient(): OpenAI {
 export const CHEAP_MODEL =
   process.env.OPENROUTER_CHEAP_MODEL ?? 'deepseek/deepseek-chat'
 export const GOOD_MODEL =
-  process.env.OPENROUTER_GOOD_MODEL ?? 'anthropic/claude-3.5-haiku'
+  process.env.OPENROUTER_GOOD_MODEL ?? 'anthropic/claude-3.5-sonnet'
 
 // ── Prompt builders ────────────────────────────────────────────────────────
 
@@ -59,25 +59,36 @@ export function buildSlotFillPrompt(
   slots: SlotDefinition[],
   copy: GeneratedCopy
 ): string {
-  const slotList = slots
-    .filter(s => s.type === 'text')
+  const textSlots = slots.filter(s => s.type === 'text')
+  const slotList = textSlots
     .map(
       s =>
-        `- "${s.id}" (slide ${s.slide}, label: "${s.label}", maxChars: ${s.maxChars ?? 'none'})`
+        `- "${s.id}" (slide ${s.slide}, label: "${s.label}"${s.maxChars ? `, maxChars: ${s.maxChars}` : ''})`
     )
     .join('\n')
 
   const sections = [
-    'Map the following generated copy into the carousel template slots.',
-    `## Template Slots\n${slotList}`,
+    'Map the following carousel copy into every template slot. Fill ALL slots — leave NONE empty.',
     `## Generated Copy\n${JSON.stringify(copy, null, 2)}`,
+    `## Template Slots\n${slotList}`,
     [
-      '## Rules (STRICT)',
-      '- Output a single flat JSON object only: { "slot_id": "content", ... }',
+      '## Mapping Rules (STRICT)',
+      '- Output a single flat JSON object only: { "slot_id": "value", ... } — all slots must appear',
       '- Never exceed maxChars for any slot — abbreviate gracefully if needed',
-      '- Never invent content not present in the generated copy',
       '- Preserve the creator\'s tone exactly',
-      '- If a slot has no matching copy, use an empty string ""',
+      '',
+      '## Slot Type Guide (use label to infer slot purpose)',
+      '- headline / title / hook → use the slide\'s headline from "slides[n].headline"',
+      '- body / text / description / content → use "slides[n].body"',
+      '- stat / number / figure → use "slides[n].stat" if present, else extract a key number from the body',
+      '- quote / pullquote → use "slides[n].quote" if present, else extract the punchiest line from the body',
+      '- cta / follow / action → use the "cta" field',
+      '- brand / handle / creator / author → use "@creator" (no real brand info available)',
+      '- date / time / when → use "Today"',
+      '- category / tag / topic / label / genre → derive a 1-3 word category from the carousel topic (e.g. "AI & Tech", "Finance", "Health")',
+      '- source / attribution / via → use "Source" or derive from context',
+      '- numbered list slots (e.g. "CIRCLED LINE ONE", "Point 1", "Step 2") → split the body\'s list items across these slots in order; if the body has no list, break the body sentence into short phrases',
+      '- any remaining slot → use the most contextually appropriate short phrase from the copy',
     ].join('\n'),
   ]
   return sections.join('\n\n')
@@ -271,7 +282,7 @@ export async function generateTemplate(
     max_tokens: 8000,
   })
 
-  const html = response.choices[0].message.content ?? ''
+  const html = response.choices?.[0]?.message?.content ?? ''
   // Strip any accidental markdown fences the model may have wrapped the output in
   return html.replace(/^```html?\n?/i, '').replace(/\n?```$/i, '').trim()
 }

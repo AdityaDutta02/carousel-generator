@@ -80,6 +80,7 @@ export default function NewTemplatePage() {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [panelTab, setPanelTab] = useState<PanelTab>('edit')
+  const [previewSlideIndex, setPreviewSlideIndex] = useState(0)
 
   // captureResolve holds the resolve function for the in-flight capture promise
   const captureResolve = useRef<((dataUrl: string | null) => void) | null>(null)
@@ -123,8 +124,11 @@ export default function NewTemplatePage() {
         throw new Error(json.error)
       }
       const { html } = await res.json() as { html: string }
+      const slideCount = [...html.matchAll(/class="slide(?:\s|")/g)].length || 1
       setTemplateHtml(html)
       setSchema(autoDetectSchema(html))
+      setSlides(Array.from({ length: slideCount }, (_, i) => ({ index: i, slots: {} })))
+      setPreviewSlideIndex(0)
       setStep('editing')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Generation failed')
@@ -159,6 +163,7 @@ export default function NewTemplatePage() {
     try {
       const formData = new FormData()
       formData.append('name', templateName.trim())
+      formData.append('title', templateName.trim())
       formData.append('scope', 'user')
       formData.append(
         'owner',
@@ -194,7 +199,7 @@ export default function NewTemplatePage() {
     }
   }
 
-  const srcdoc = templateHtml ? buildSrcdoc(templateHtml, schema, slides, 0) : ''
+  const srcdoc = templateHtml ? buildSrcdoc(templateHtml, schema, slides, previewSlideIndex) : ''
 
   return (
     <div className="flex flex-col h-screen bg-zinc-950 text-white">
@@ -268,7 +273,7 @@ export default function NewTemplatePage() {
       )}
       {step === 'editing' && (
         <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1 flex items-center justify-center bg-zinc-900 p-8 overflow-hidden">
+          <div className="flex-1 flex flex-col items-center justify-center bg-zinc-900 p-8 gap-4 overflow-hidden">
             <SlidePreview
               ref={previewRef}
               srcdoc={srcdoc}
@@ -278,6 +283,35 @@ export default function NewTemplatePage() {
               onSlotClick={handleSlotClick}
               onCaptureResult={handleCaptureResult}
             />
+            {slides.length > 1 && (
+              <div className="flex items-center gap-3 text-sm text-zinc-400">
+                <button
+                  type="button"
+                  disabled={previewSlideIndex === 0}
+                  onClick={() => {
+                    const next = previewSlideIndex - 1
+                    setPreviewSlideIndex(next)
+                    previewRef.current?.switchSlide(next)
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                >
+                  ←
+                </button>
+                <span>Slide {previewSlideIndex + 1} / {slides.length}</span>
+                <button
+                  type="button"
+                  disabled={previewSlideIndex === slides.length - 1}
+                  onClick={() => {
+                    const next = previewSlideIndex + 1
+                    setPreviewSlideIndex(next)
+                    previewRef.current?.switchSlide(next)
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                >
+                  →
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="w-80 border-l border-zinc-800 flex flex-col overflow-hidden shrink-0">
