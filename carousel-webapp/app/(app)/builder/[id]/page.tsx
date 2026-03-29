@@ -103,6 +103,16 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
     }
   }
 
+  const activeCanvasWidth = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.width ?? 1080
+  const activeCanvasHeight = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.height ?? 1350
+  const srcdoc = useMemo(() => {
+    if (!templateHtml || !schema || !carousel || carousel.slides.length === 0) {
+      return `<html><body style="background:#1a1a1a;display:flex;align-items:center;justify-content:center;height:100vh;color:#666;font-family:sans-serif"><p>Select a template to start</p></body></html>`
+    }
+    return buildSrcdoc(templateHtml, schema, carousel.slides, 0,
+      { canvasWidth: activeCanvasWidth, canvasHeight: activeCanvasHeight })
+  }, [templateHtml, schema, carousel, activeCanvasWidth, activeCanvasHeight])
+
   if (isLoading || !carousel) {
     return (
       <div className="p-8 space-y-4">
@@ -116,16 +126,6 @@ export default function BuilderPage({ params }: { params: Promise<{ id: string }
   const currentSlotValue = activeSlot && currentSlide
     ? currentSlide.slots[activeSlot.id] ?? activeSlot.default ?? ''
     : ''
-
-  const activeCanvasWidth = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.width ?? 1080
-  const activeCanvasHeight = CANVAS_SIZES[canvasSizeKey as keyof typeof CANVAS_SIZES]?.height ?? 1350
-  const srcdoc = useMemo(() => {
-    if (!templateHtml || !schema || carousel.slides.length === 0) {
-      return `<html><body style="background:#1a1a1a;display:flex;align-items:center;justify-content:center;height:100vh;color:#666;font-family:sans-serif"><p>Select a template to start</p></body></html>`
-    }
-    return buildSrcdoc(templateHtml, schema, carousel.slides, 0,
-      { canvasWidth: activeCanvasWidth, canvasHeight: activeCanvasHeight })
-  }, [templateHtml, schema, carousel.slides, activeCanvasWidth, activeCanvasHeight])
 
   return (
     <div className="flex h-screen overflow-hidden">
