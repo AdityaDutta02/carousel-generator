@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createPocketBaseClient, getCarousels } from '@/lib/pocketbase'
 import type { CarouselRecord } from '@/lib/pocketbase'
@@ -26,9 +26,7 @@ export default function CarouselsPage() {
     <div className="p-8 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Carousels</h1>
-        <Button asChild>
-          <Link href="/carousels/new">+ New Carousel</Link>
-        </Button>
+        <Link href="/carousels/new" className={buttonVariants()}>+ New Carousel</Link>
       </div>
 
       {carousels.length === 0 ? (

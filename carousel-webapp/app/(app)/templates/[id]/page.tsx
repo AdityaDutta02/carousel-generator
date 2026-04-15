@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -75,9 +75,7 @@ export default function TemplateDetailPage() {
   return (
     <div className="p-8 max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/templates">&larr; Templates</Link>
-        </Button>
+        <Link href="/templates" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>&larr; Templates</Link>
         <h1 className="text-2xl font-semibold flex-1">{record?.name}</h1>
         <Button variant="destructive" size="sm" onClick={() => void handleDelete()} disabled={deleting}>
           {deleting ? 'Deleting...' : 'Delete'}

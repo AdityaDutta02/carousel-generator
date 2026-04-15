@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -119,9 +119,7 @@ export default function CarouselEditorPage() {
     <div className="flex flex-col h-screen">
       {/* Top bar */}
       <div className="flex items-center gap-3 px-4 py-2 border-b bg-background shrink-0">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/carousels">← Carousels</Link>
-        </Button>
+        <Link href="/carousels" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>← Carousels</Link>
         <Separator orientation="vertical" className="h-5" />
         <Input
           value={carouselName}

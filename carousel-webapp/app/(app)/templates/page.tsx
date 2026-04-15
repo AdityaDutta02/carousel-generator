@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { createPocketBaseClient, getTemplates } from '@/lib/pocketbase'
 import type { TemplateRecord } from '@/lib/pocketbase'
@@ -26,9 +26,7 @@ export default function TemplatesPage() {
     <div className="p-8 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold">Templates</h1>
-        <Button asChild>
-          <Link href="/templates/new">+ New Template</Link>
-        </Button>
+        <Link href="/templates/new" className={buttonVariants()}>+ New Template</Link>
       </div>
 
       {templates.length === 0 ? (
