@@ -2,51 +2,53 @@
 migrate((app) => {
   const collection = app.findCollectionByNameOrId("pbc_184785686") // templates
 
+  // Add template_json field
+  collection.fields.addAt(collection.fields.length, new Field({
+    "hidden": false,
+    "id": "json_template_json",
+    "maxSize": 0,
+    "name": "template_json",
+    "presentable": false,
+    "required": false,
+    "system": false,
+    "type": "json"
+  }))
+
+  // Add is_system field
+  collection.fields.addAt(collection.fields.length, new Field({
+    "hidden": false,
+    "id": "bool_is_system",
+    "name": "is_system",
+    "presentable": false,
+    "required": false,
+    "system": false,
+    "type": "bool"
+  }))
+
+  // Open rules for single-user local v2 (no auth required)
   unmarshal({
-    "fields": [
-      {
-        "hidden": false,
-        "id": "json_template_json",
-        "maxSize": 0,
-        "name": "template_json",
-        "presentable": false,
-        "required": false,
-        "system": false,
-        "type": "json"
-      },
-      {
-        "hidden": false,
-        "id": "file_thumbnail",
-        "maxSelect": 1,
-        "maxSize": 5242880,
-        "mimeTypes": ["image/png", "image/jpeg", "image/webp"],
-        "name": "thumbnail",
-        "presentable": false,
-        "protected": false,
-        "required": false,
-        "system": false,
-        "thumbs": ["300x300t"],
-        "type": "file"
-      },
-      {
-        "hidden": false,
-        "id": "bool_is_system",
-        "name": "is_system",
-        "presentable": false,
-        "required": false,
-        "system": false,
-        "type": "bool"
-      }
-    ]
+    "createRule": "",
+    "deleteRule": "",
+    "listRule": "",
+    "updateRule": "",
+    "viewRule": ""
   }, collection)
 
   return app.save(collection)
 }, (app) => {
   const collection = app.findCollectionByNameOrId("pbc_184785686")
-  const fields = collection.fields
-  for (const f of ["json_template_json", "file_thumbnail", "bool_is_system"]) {
-    const idx = fields.findIndex((x) => x.id === f)
-    if (idx >= 0) fields.splice(idx, 1)
-  }
+
+  collection.fields.removeById("json_template_json")
+  collection.fields.removeById("bool_is_system")
+
+  // Restore auth rules
+  unmarshal({
+    "createRule": "@request.auth.id != \"\"",
+    "deleteRule": "owner = @request.auth.id",
+    "listRule": "scope = \"system\" || owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "viewRule": "scope = \"system\" || owner = @request.auth.id"
+  }, collection)
+
   return app.save(collection)
 })
