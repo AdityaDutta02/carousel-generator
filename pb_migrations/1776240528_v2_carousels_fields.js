@@ -48,11 +48,11 @@ migrate((app) => {
 
   // Open rules for single-user local v2 (no auth required)
   unmarshal({
-    "createRule": "",
-    "deleteRule": "",
-    "listRule": "",
-    "updateRule": "",
-    "viewRule": ""
+    "createRule": null,
+    "deleteRule": null,
+    "listRule": null,
+    "updateRule": null,
+    "viewRule": null
   }, collection)
 
   return app.save(collection)
