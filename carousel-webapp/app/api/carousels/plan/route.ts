@@ -18,8 +18,8 @@ export async function POST(request: Request) {
     brand: { brand: string; platform: string }
   } = await request.json()
 
-  if (!content || !templateJson || !slideCount) {
-    return NextResponse.json({ error: 'content, templateJson, slideCount required' }, { status: 400 })
+  if (!content || !templateJson || !slideCount || !brand?.brand) {
+    return NextResponse.json({ error: 'content, templateJson, slideCount, brand required' }, { status: 400 })
   }
 
   const prompt = buildPlanPrompt(content, templateJson, slideCount, brand)

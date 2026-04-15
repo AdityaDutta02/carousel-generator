@@ -1,9 +1,9 @@
 // carousel-webapp/lib/models.ts
 // OpenRouter-based model completion client
 
-export const VISION_MODEL = 'qwen/qwen2.5-vl-72b-instruct'
-export const PLAN_MODEL = 'deepseek/deepseek-chat'
-export const RENDER_MODEL = 'qwen/qwen2.5-coder-32b-instruct'
+export const VISION_MODEL = process.env.VISION_MODEL ?? 'qwen/qwen2.5-vl-72b-instruct'
+export const PLAN_MODEL   = process.env.PLAN_MODEL   ?? 'deepseek/deepseek-chat'
+export const RENDER_MODEL = process.env.RENDER_MODEL ?? 'qwen/qwen2.5-coder-32b-instruct'
 
 export interface TextContent {
   type: 'text'
