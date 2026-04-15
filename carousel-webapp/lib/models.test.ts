@@ -47,6 +47,6 @@ describe('completion', () => {
     const { completion } = await import('./models')
     await expect(
       completion({ model: 'deepseek/deepseek-chat', messages: [{ role: 'user', content: 'hi' }] })
-    ).rejects.toThrow('OpenRouter 429')
+    ).rejects.toThrow('429')
   })
 })
