@@ -27,11 +27,11 @@ migrate((app) => {
 
   // Open rules for single-user local v2 (no auth required)
   unmarshal({
-    "createRule": null,
-    "deleteRule": null,
-    "listRule": null,
-    "updateRule": null,
-    "viewRule": null
+    "createRule": "",
+    "deleteRule": "",
+    "listRule": "",
+    "updateRule": "",
+    "viewRule": ""
   }, collection)
 
   return app.save(collection)
@@ -41,7 +41,7 @@ migrate((app) => {
   collection.fields.removeById("json_template_json")
   collection.fields.removeById("bool_is_system")
 
-  // Restore auth rules
+  // Restore original rules
   unmarshal({
     "createRule": "@request.auth.id != \"\"",
     "deleteRule": "owner = @request.auth.id",
