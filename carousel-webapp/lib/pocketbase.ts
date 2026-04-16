@@ -25,10 +25,7 @@ export interface TemplateRecord {
 }
 
 export async function getTemplates(pb: PocketBase): Promise<TemplateRecord[]> {
-  const records = await pb.collection('templates').getFullList<TemplateRecord>({
-    sort: '-created',
-  })
-  return records
+  return pb.collection('templates').getFullList<TemplateRecord>({ sort: '-id' })
 }
 
 export async function getTemplate(pb: PocketBase, id: string): Promise<TemplateRecord> {
@@ -76,7 +73,7 @@ export interface CarouselRecord {
 }
 
 export async function getCarousels(pb: PocketBase): Promise<CarouselRecord[]> {
-  return pb.collection('carousels').getFullList<CarouselRecord>({ sort: '-created' })
+  return pb.collection('carousels').getFullList<CarouselRecord>({ sort: '-id' })
 }
 
 export async function getCarousel(pb: PocketBase, id: string): Promise<CarouselRecord> {
